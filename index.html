@@ -629,7 +629,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (e) e.textContent = hints[1];
 });
 let situation = '', charName = '', charRole = '';
-let hist = [], exchanges = 0, autoCont = 0, nmPhrase = '';
+let hist = [], exchanges = 0, autoCont = 0, nmPhrase = '', lastUserMsg = '';
 let isSpeaking = false, voices = [], recognition = null, isRec = false;
 let esCount = 0, enCount = 0, subCache = '';
 
@@ -743,6 +743,7 @@ async function send() {
   document.getElementById('send-btn').disabled = true;
   closeNM(); autoCont = 0; exchanges++;
   detectLang(text) === 'es' ? esCount++ : enCount++;
+  lastUserMsg = text;
   addMsg('user', text);
   hist.push({ role: 'user', content: text });
   showThinking(true);
@@ -770,7 +771,33 @@ async function send() {
       handleCont(ai2);
     } catch(e2) {
       showThinking(false);
-      addMsg('system', 'Algo ha fallado. Inténtalo de nuevo.');
+      // Show retry button
+const h = document.getElementById('history');
+const t = document.getElementById('thinking');
+const btn = document.createElement('button');
+btn.className = 'cont-btn';
+btn.textContent = '↺ Reintentar';
+btn.onclick = async () => {
+  btn.remove();
+  if (lastUserMsg) {
+    showThinking(true);
+    try {
+      const ai3 = await callAI(null);
+      showThinking(false);
+      applyChar(ai3);
+      showLine(ai3.line, ai3.subtitle_es);
+      addMsg('char', ai3.line, ai3.subtitle_es);
+      hist.push({ role: 'assistant', content: ai3.line });
+      if (ai3.natural_model) showNM(ai3.natural_model);
+      handleCont(ai3);
+    } catch(e3) {
+      showThinking(false);
+      addMsg('system', 'Sigue sin funcionar. Inténtalo en un momento.');
+    }
+  }
+};
+h.insertBefore(btn, t);
+h.scrollTop = h.scrollHeight;
     }
   }
   document.getElementById('send-btn').disabled = false;
@@ -783,7 +810,7 @@ function handleCont(ai) {
   // Also detect delivery phrases that need continuation
   const line = (ai.line || '').toLowerCase();
   const needsCont = !ai.expects_user_input || 
-    /coming (right)? (up|now)|on its way|right away|one moment|just a moment|here you go|there you go|coming now/.test(line);
+    /coming (right)? (up|now)|on its way|right away|one moment|just a moment|here you go|there you go|coming now|let me check|let me look|i will check|i'll check|checking now|reviewing now/.test(line);
   if (needsCont && autoCont < 1) {
     autoCont++;
     setTimeout(autoContinue, 1400);
