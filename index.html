@@ -1017,11 +1017,8 @@ function processAIResponse(ai) {
 
 // ─── SUBTÍTULOS ───────────────────────────────────
 function getCurrentSubtitleLevel() {
-  const exchanges = sessionMemory.totalExchanges;
-  // Keep full subtitles for longer at the start — user needs this support
-  if (exchanges < 6) return 'full';
-  if (exchanges < 12) return 'soft';
-  return 'demand';
+  // Always show subtitles during testing
+  return 'full';
 }
 
 function updateDialogue(line, subtitle, level) {
@@ -1074,10 +1071,32 @@ function toggleSubtitle() {
 }
 
 function getSubtitleForLine(line) {
+  if (!line) return null;
+  const lineLower = line.toLowerCase();
+  // Check core expressions
   const match = SITUATION.coreExpressions.find(e =>
-    line.toLowerCase().includes(e.en.toLowerCase().slice(0, 12))
+    lineLower.includes(e.en.toLowerCase().slice(0, 12))
   );
-  return match ? match.es : null;
+  if (match) return match.es;
+  // Fallback translations for common hotel phrases
+  const fallbacks = [
+    { en: 'good evening', es: 'Buenas tardes' },
+    { en: 'good morning', es: 'Buenos días' },
+    { en: 'welcome', es: 'Bienvenido' },
+    { en: 'how can i help', es: '¿En qué puedo ayudarte?' },
+    { en: 'reservation', es: 'reserva' },
+    { en: 'your name', es: 'tu nombre' },
+    { en: 'how many night', es: '¿Cuántas noches?' },
+    { en: 'third floor', es: 'tercer piso' },
+    { en: 'key card', es: 'tarjeta-llave' },
+    { en: 'breakfast', es: 'desayuno' },
+    { en: 'enjoy your stay', es: '¡Que disfrutes tu estancia!' },
+    { en: 'perfect', es: 'Perfecto' },
+    { en: 'of course', es: 'Por supuesto' },
+    { en: 'room', es: 'habitación' },
+  ];
+  const fb = fallbacks.find(f => lineLower.includes(f.en));
+  return fb ? fb.es : '...';
 }
 
 // ─── MODELO NATURAL ───────────────────────────────
