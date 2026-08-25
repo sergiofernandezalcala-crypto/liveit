@@ -731,7 +731,7 @@ async function startExperience() {
     addMsg('char', ai.line, ai.subtitle_es);
     hist.push({ role: 'assistant', content: ai.line });
     handleCont(ai);
-  } catch(e) { showThinking(false); showErr(e.message); }
+  } catch(e) { showThinking(false); }
 }
 
 // ── SEND ──────────────────────────────────────
@@ -755,7 +755,24 @@ async function send() {
     hist.push({ role: 'assistant', content: ai.line });
     if (ai.natural_model) showNM(ai.natural_model);
     handleCont(ai);
-  } catch(e) { showThinking(false); showErr(e.message); }
+  } catch(e) {
+    showThinking(false);
+    // Retry once silently before showing anything
+    try {
+      showThinking(true);
+      const ai2 = await callAI(null);
+      showThinking(false);
+      applyChar(ai2);
+      showLine(ai2.line, ai2.subtitle_es);
+      addMsg('char', ai2.line, ai2.subtitle_es);
+      hist.push({ role: 'assistant', content: ai2.line });
+      if (ai2.natural_model) showNM(ai2.natural_model);
+      handleCont(ai2);
+    } catch(e2) {
+      showThinking(false);
+      addMsg('system', 'Algo ha fallado. Inténtalo de nuevo.');
+    }
+  }
   document.getElementById('send-btn').disabled = false;
 }
 
@@ -786,7 +803,7 @@ async function autoContinue() {
     hist.push({ role: 'assistant', content: ai.line });
     if (ai.natural_model) showNM(ai.natural_model);
     handleCont(ai);
-  } catch(e) { showThinking(false); showErr(e.message); }
+  } catch(e) { showThinking(false); }
 }
 
 function showContBtn() {
