@@ -689,6 +689,11 @@ For natural_model — ALWAYS fill this field:
 - User wrote broken English → correct it ("I want pizza salmon" → "I'd like a salmon pizza")
 - User wrote correct English → provide the most natural version
 
+For expects_user_input:
+- Set FALSE when you perform an action ("let me get", "here you go", "let me check") — the scene continues automatically
+- Set FALSE when you make a statement that doesn't need a response
+- Set TRUE only when you ask the user a direct question that needs their answer
+
 For mood → choose: hotel, cafe, fashion, airport, bar, market, taxi, beach, or default`;
 }
 
@@ -807,17 +812,9 @@ h.scrollTop = h.scrollHeight;
 
 // ── CONTINUATION ──────────────────────────────
 function handleCont(ai) {
-  // situation_ended is ignored — only user can end the situation via ↺ Empezar
-  // if (ai.situation_ended) { setTimeout(showEnding, 4000); return; }
-  // Also detect delivery phrases that need continuation
-  const line = (ai.line || '').toLowerCase();
-  const needsCont = !ai.expects_user_input || 
-    /coming (right)? (up|now)|on its way|right away|one moment|just a moment|here you go|there you go|coming now|let me check|let me look|i will check|i'll check|checking now|reviewing now/.test(line);
-  if (needsCont && autoCont < 1) {
+  if (!ai.expects_user_input && autoCont < 2) {
     autoCont++;
-    setTimeout(autoContinue, 1400);
-  } else if (needsCont) {
-    showContBtn();
+    setTimeout(autoContinue, 1200);
   }
 }
 
