@@ -741,9 +741,9 @@ const SITUATION = {
     name: "Emma",
     role: "recepcionista",
     greeting: "Emma — Recepcionista",
-    voice: "en-GB",
-    voiceRate: 0.82,
-    voicePitch: 1.08,
+    voice: "en-US",
+    voiceRate: 0.62,
+    voicePitch: 1.0,
     personality: "Amable y profesional. Entiende siempre la intención aunque el inglés sea imperfecto o el usuario hable español. Nunca corrige explícitamente. Refleja de forma natural la forma correcta."
   },
   user: {
@@ -864,45 +864,17 @@ async function openSituation() {
 // ─── CONSTRUIR PROMPT ─────────────────────────────
 function buildSystemPrompt() {
   const currentBeat = SITUATION.beats[currentBeatIndex] || SITUATION.beats[SITUATION.beats.length - 1];
-
   const pending = SITUATION.coreExpressions
     .filter(e => (sessionMemory.expressionsSeen[e.id] || 0) < 3)
-    .slice(0, 3)
-    .map(e => `- "${e.en}" (significa: "${e.es}")`)
-    .join('\n');
+    .slice(0, 2)
+    .map(e => e.en)
+    .join(' / ');
 
-  const expressionGuidance = pending
-    ? `Expresiones clave que debes introducir de forma NATURAL en los próximos turnos:\n${pending}`
-    : 'Has introducido las expresiones principales. Cierra la conversación de forma natural.';
-
-  return `Eres ${SITUATION.character.name}, ${SITUATION.character.role} en ${SITUATION.scene.title}.
-Personalidad: ${SITUATION.character.personality}
-
-Contexto: ${SITUATION.scene.ambience}
-Objetivo del usuario: ${SITUATION.user.goal}
-
-BEAT ACTUAL: ${currentBeat.desc}
-
-${expressionGuidance}
-
-REGLAS ABSOLUTAS:
-1. Responde siempre en inglés, como lo haría una persona real en ${SITUATION.scene.title}.
-2. El usuario puede escribir en español o en inglés imperfecto. SIEMPRE interpreta su intención y avanza. Nunca digas "I don't understand" o similar.
-3. Si el usuario dice algo gramaticalmente imperfecto, refléjalo de forma natural en tu respuesta (ejemplo: usuario dice "four day" → tú dices "Four nights, perfect!"). No lo corrijas explícitamente.
-4. Sé conciso. Máximo 2 frases.
-5. Avanza la situación. No esperes respuestas perfectas.
-6. Cuando llegues al beat de despedida, SIEMPRE pon situation_ended: true.
-
-RESPONDE ÚNICAMENTE CON ESTE JSON (sin markdown, sin texto extra):
-{
-  "line": "Lo que dice el personaje en inglés",
-  "subtitle_es": "Traducción al español de esa línea",
-  "intent_detected": "Qué entendiste del usuario (en español, breve)",
-  "natural_model": "Si el usuario dijo algo mejorable, la forma natural en inglés. Si fue correcto o en español, null.",
-  "beat_completed": "id del beat que completas o null",
-  "offer_learning": false,
-  "situation_ended": false
-}`;
+  return `You are Emma, a friendly hotel receptionist at Stanford Hotel London.
+Current task: ${currentBeat.desc}
+Use naturally if possible: ${pending || 'wrap up warmly'}
+Rules: respond in English only. Understand Spanish or broken English and always continue. Reflect correct forms naturally without correcting. Max 2 sentences. Set situation_ended true on farewell.
+Reply ONLY valid JSON, no markdown: {"line":"...","subtitle_es":"...","natural_model":null,"beat_completed":null,"situation_ended":false}`;
 }
 
 // ─── LLAMADA A IA (vía proxy) ─────────────────────
@@ -923,7 +895,6 @@ async function callGroq(userMessage) {
       ],
       temperature: 0.72,
       max_tokens: 280,
-      response_format: { type: 'json_object' }
     })
   });
 
@@ -933,7 +904,11 @@ async function callGroq(userMessage) {
   }
 
   const data = await response.json();
-  return JSON.parse(data.choices[0].message.content);
+  const raw = data.choices[0].message.content;
+  // Extract JSON even if model wraps it in markdown
+  const match = raw.match(/\{[\s\S]*\}/);
+  if (!match) throw new Error('No JSON in response');
+  return JSON.parse(match[0]);
 }
 
 // ─── ENVIAR MENSAJE ───────────────────────────────
@@ -1146,8 +1121,8 @@ function speak(text) {
   utterance.pitch = SITUATION.character.voicePitch;
 
   // Buscar voz en-GB
-  const preferred = voices.find(v => v.lang === 'en-GB' && v.name.includes('Female'))
-    || voices.find(v => v.lang === 'en-GB')
+  const preferred = voices.find(v => v.lang === 'en-US' && v.name.includes('Female'))
+    || voices.find(v => v.lang === 'en-US')
     || voices.find(v => v.lang.startsWith('en'));
   if (preferred) utterance.voice = preferred;
 
@@ -1167,10 +1142,10 @@ function speakPhrase(text, rate) {
   if (!('speechSynthesis' in window)) return;
   window.speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
-  u.lang = 'en-GB';
-  u.rate = rate || 0.75;
+  u.lang = 'en-US';
+  u.rate = rate || 0.62;
   u.pitch = SITUATION.character.voicePitch;
-  const preferred = voices.find(v => v.lang === 'en-GB') || voices.find(v => v.lang.startsWith('en'));
+  const preferred = voices.find(v => v.lang === 'en-US') || voices.find(v => v.lang.startsWith('en'));
   if (preferred) u.voice = preferred;
   window.speechSynthesis.speak(u);
 }
