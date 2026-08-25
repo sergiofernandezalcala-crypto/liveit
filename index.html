@@ -854,11 +854,28 @@ function startExperience() {
 async function openSituation() {
   const opening = SITUATION.opening;
   updateDialogue(opening.line, opening.subtitle, 'full');
-  speak(opening.line);
   addToHistory('char', opening.line);
   conversationHistory.push({ role: 'assistant', content: opening.line });
   SITUATION.beats[0].done = true;
   currentBeatIndex = 1;
+  // Wait for voices to load before speaking
+  waitForVoicesAndSpeak(opening.line);
+}
+
+function waitForVoicesAndSpeak(text) {
+  if (voices.length > 0) {
+    speak(text);
+  } else {
+    let attempts = 0;
+    const interval = setInterval(() => {
+      voices = window.speechSynthesis.getVoices();
+      attempts++;
+      if (voices.length > 0 || attempts > 20) {
+        clearInterval(interval);
+        speak(text);
+      }
+    }, 100);
+  }
 }
 
 // ─── CONSTRUIR PROMPT ─────────────────────────────
@@ -946,8 +963,11 @@ async function sendMessage() {
 // ─── PROCESAR RESPUESTA ───────────────────────────
 function processAIResponse(ai) {
   const line = ai.line || '';
-  const subtitle = ai.subtitle_es || getSubtitleForLine(line);
   const level = getCurrentSubtitleLevel();
+  // Always use subtitle from AI if available, fallback to core expressions
+  const subtitle = (ai.subtitle_es && ai.subtitle_es.length > 2) 
+    ? ai.subtitle_es 
+    : getSubtitleForLine(line);
 
   updateDialogue(line, subtitle, level);
   speak(line);
@@ -994,12 +1014,10 @@ function processAIResponse(ai) {
 
 // ─── SUBTÍTULOS ───────────────────────────────────
 function getCurrentSubtitleLevel() {
-  const seenCount = Object.values(sessionMemory.expressionsSeen).reduce((a, b) => a + b, 0);
   const exchanges = sessionMemory.totalExchanges;
-
-  if (exchanges < 3) return 'full';
-  if (seenCount < 6) return 'full';
-  if (seenCount < 12) return 'soft';
+  // Keep full subtitles for longer at the start — user needs this support
+  if (exchanges < 6) return 'full';
+  if (exchanges < 12) return 'soft';
   return 'demand';
 }
 
@@ -1116,7 +1134,7 @@ function speak(text) {
   window.speechSynthesis.cancel();
 
   const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = 'en-GB';
+  utterance.lang = 'en-US';
   utterance.rate = SITUATION.character.voiceRate;
   utterance.pitch = SITUATION.character.voicePitch;
 
