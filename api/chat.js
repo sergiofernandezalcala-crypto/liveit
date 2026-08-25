@@ -12,6 +12,25 @@ export default async function handler(req, res) {
   try {
     const { system, messages, temperature, max_tokens } = req.body;
 
+    const tool = {
+      name: "respond_to_user",
+      description: "Respond to the user in character",
+      input_schema: {
+        type: "object",
+        properties: {
+          line:               { type: "string" },
+          subtitle_es:        { type: "string" },
+          char_name:          { type: "string" },
+          char_role:          { type: "string" },
+          natural_model:      { type: "string" },
+          expects_user_input: { type: "boolean" },
+          situation_ended:    { type: "boolean" },
+          mood:               { type: "string" }
+        },
+        required: ["line","subtitle_es","char_name","char_role","natural_model","expects_user_input","situation_ended","mood"]
+      }
+    };
+
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -23,14 +42,24 @@ export default async function handler(req, res) {
         model: 'claude-haiku-4-5',
         system,
         messages,
-        temperature: temperature || 0.6,
+        tools: [tool],
+        tool_choice: { type: "any" },
+        temperature: temperature || 0.7,
         max_tokens: max_tokens || 400
       })
     });
 
     const data = await response.json();
     if (!response.ok) return res.status(response.status).json(data);
-    return res.status(200).json(data);
+
+    // Extract structured input from tool_use block
+    const toolBlock = data.content.find(b => b.type === 'tool_use');
+    if (!toolBlock) return res.status(500).json({ error: 'No tool_use block in response' });
+
+    // Return in same format frontend expects
+    return res.status(200).json({
+      content: [{ type: 'tool_result', input: toolBlock.input }]
+    });
 
   } catch (err) {
     return res.status(502).json({ error: 'Proxy error', detail: err.message });
