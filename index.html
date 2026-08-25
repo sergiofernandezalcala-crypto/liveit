@@ -120,17 +120,24 @@ textarea.sit-input::placeholder { color: var(--ink3); }
 }
 
 .example-chip {
-  padding: 0.3rem 0.75rem;
+  padding: 0.5rem 0.85rem;
   background: #E8FFF2;
   border: none;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  color: var(--ink2);
+  border-radius: 12px;
+  font-size: 0.78rem;
+  color: var(--ink);
   cursor: pointer;
   font-family: var(--sans);
   transition: background 0.15s;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  width: 100%;
 }
 .example-chip:hover { background: #C8F5DC; }
+.chip-main { font-weight: 500; color: var(--ink); }
+.chip-sub  { font-size: 0.68rem; color: var(--ink3); }
 
 .btn-go {
   width: 100%;
@@ -508,12 +515,27 @@ textarea.sit-input::placeholder { color: var(--ink3); }
     <div class="setup-hint">Describe la situación. El personaje hablará en inglés. Tú responde como quieras.</div>
     <textarea class="sit-input" id="sit-input" rows="3"
       placeholder="Ej: Acabo de llegar a un hotel en Tokio y necesito hacer el check-in."></textarea>
-    <div class="examples">
-      <button class="example-chip" onclick="setExample(this)">☕ Londres</button>
-      <button class="example-chip" onclick="setExample(this)">🏨 Nueva York</button>
-      <button class="example-chip" onclick="setExample(this)">🚕 Bangkok</button>
-      <button class="example-chip" onclick="setExample(this)">🛒 Berlín</button>
-      <button class="example-chip" onclick="setExample(this)">✈️ Dubai</button>
+    <div class="examples" style="flex-direction:column;">
+      <button class="example-chip" onclick="setExample(this)">
+        <span class="chip-main">Me han perdido la maleta</span>
+        <span class="chip-sub">Bangkok · Aeropuerto</span>
+      </button>
+      <button class="example-chip" onclick="setExample(this)">
+        <span class="chip-main">La reserva del hotel no aparece</span>
+        <span class="chip-sub">Nueva York · Hotel</span>
+      </button>
+      <button class="example-chip" onclick="setExample(this)">
+        <span class="chip-main">Quiero regatear en el mercado</span>
+        <span class="chip-sub">Marrakech · Mercado</span>
+      </button>
+      <button class="example-chip" onclick="setExample(this)">
+        <span class="chip-main">Quiero devolver algo que compré ayer</span>
+        <span class="chip-sub">Milán · Tienda de moda</span>
+      </button>
+      <button class="example-chip" onclick="setExample(this)">
+        <span class="chip-main">El camarero no me entiende</span>
+        <span class="chip-sub">Roma · Restaurante</span>
+      </button>
     </div>
     <button class="btn-go" onclick="startExperience()">Entrar en la situación →</button>
   </div>
