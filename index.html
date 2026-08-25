@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v1.4 -->
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -968,6 +969,8 @@ function processAIResponse(ai) {
   const subtitle = (ai.subtitle_es && ai.subtitle_es.length > 2) 
     ? ai.subtitle_es 
     : getSubtitleForLine(line);
+  console.log('AI response:', JSON.stringify(ai));
+  console.log('Subtitle:', subtitle, 'Level:', level);
 
   updateDialogue(line, subtitle, level);
   speak(line);
