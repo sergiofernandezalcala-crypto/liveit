@@ -546,7 +546,7 @@ textarea.sit-input::placeholder { color: var(--ink3); }
 <!-- EXPERIENCE -->
 <div id="experience">
   <div class="scene-strip">
-    <button onclick="goHome()" style="background:rgba(255,255,255,0.12);border:none;color:white;cursor:pointer;font-size:0.75rem;font-weight:600;font-family:var(--sans);padding:0.3rem 0.7rem;border-radius:20px;margin-right:0.4rem;white-space:nowrap;">← Inicio</button>
+    <button onclick="goHome()" style="background:rgba(255,255,255,0.12);border:none;color:white;cursor:pointer;font-size:0.75rem;font-weight:600;font-family:var(--sans);padding:0.3rem 0.7rem;border-radius:20px;margin-right:0.4rem;white-space:nowrap;">↺ Empezar</button>
     <div class="scene-dot"></div>
     <div class="scene-name" id="scene-name"></div>
     <div class="char-pill" id="char-pill"></div>
@@ -682,7 +682,13 @@ When the user has achieved their goal, set situation_ended to true.
 Always use the most basic English words. If there is a simpler word, use it. Never use formal or complex language.
 
 Reply ONLY with this JSON:
-{"line":"English reply","subtitle_es":"translation of your English reply into the user's language (Spanish if unknown)","char_name":"name","char_role":"role","natural_model":"natural English of what user tried to say or empty string","expects_user_input":true,"situation_ended":false,"mood":"one of: hotel, cafe, fashion, airport, bar, market, taxi, beach, default"}`;
+{"line":"English reply","subtitle_es":"translation of your English reply into the user's language (Spanish if unknown)","char_name":"name","char_role":"role","natural_model":"natural correct English version of what the user said — ALWAYS fill this, never leave empty","expects_user_input":true,"situation_ended":false,"mood":"one of: hotel, cafe, fashion, airport, bar, market, taxi, beach, default"}
+
+IMPORTANT for natural_model:
+- If user wrote in Spanish: translate it to natural English (e.g. "Quiero una pizza" → "I'd like a pizza, please")
+- If user wrote in broken English: correct it naturally (e.g. "I want pizza salmon" → "I'd like a salmon pizza")
+- If user wrote correct English: still provide the most natural version
+- Always use correct grammar — never write "You welcome", always "You're welcome"`;
 }
 
 // ── AI ────────────────────────────────────────
@@ -755,11 +761,16 @@ async function send() {
 
 // ── CONTINUATION ──────────────────────────────
 function handleCont(ai) {
-  if (ai.situation_ended) { setTimeout(showEnding, 4000); return; }
-  if (!ai.expects_user_input && autoCont < 1) {
+  // situation_ended is ignored — only user can end the situation via ↺ Empezar
+  // if (ai.situation_ended) { setTimeout(showEnding, 4000); return; }
+  // Also detect delivery phrases that need continuation
+  const line = (ai.line || '').toLowerCase();
+  const needsCont = !ai.expects_user_input || 
+    /coming (right)? (up|now)|on its way|right away|one moment|just a moment|here you go|there you go|coming now/.test(line);
+  if (needsCont && autoCont < 1) {
     autoCont++;
-    setTimeout(autoContinue, 1300);
-  } else if (!ai.expects_user_input) {
+    setTimeout(autoContinue, 1400);
+  } else if (needsCont) {
     showContBtn();
   }
 }
@@ -850,7 +861,14 @@ function showNM(phrase) {
       '<button class="nm-btn nm-listen" onclick="listenNM()">🔊 Escuchar</button>' +
       (recognition ? '<button class="nm-btn nm-listen" onclick="repeatNM()">🎙 Repetir</button>' : '') +
     '</div>';
-  h.insertBefore(card, t);
+  // Insert right after the last user message, before thinking indicator
+  const userMsgs = h.querySelectorAll('.msg-user');
+  const lastUser = userMsgs[userMsgs.length - 1];
+  if (lastUser && lastUser.nextSibling) {
+    h.insertBefore(card, lastUser.nextSibling);
+  } else {
+    h.insertBefore(card, t);
+  }
   h.scrollTop = h.scrollHeight;
 }
 function closeNM() {}
@@ -883,24 +901,24 @@ function showEnding() {
   document.getElementById('ending').style.display = 'flex';
 }
 function goHome() {
-  if (!confirm('¿Salir de la situación actual?')) return;
   newSit();
 }
 
 function newSit() {
+  // Reset state
   hist = []; exchanges = 0; autoCont = 0; esCount = 0; enCount = 0;
   charName = ''; charRole = ''; nmPhrase = ''; subCache = '';
-  document.getElementById('ending').style.display = 'none';
-  document.getElementById('history').querySelectorAll('.msg,.nm-hist,.cont-btn').forEach(e => e.remove());
-  document.getElementById('char-line').textContent = '…';
-  document.getElementById('subtitle').textContent = '';
-  document.getElementById('nm-card').classList.remove('on');
-  document.getElementById('char-name-tag').textContent = '';
-  document.getElementById('char-pill').textContent = '';
-  document.getElementById('scene-name').textContent = '';
-  document.getElementById('sit-input').value = '';
+  // Reset UI
+  try {
+    document.getElementById('ending').style.display = 'none';
+    document.getElementById('experience').style.display = 'none';
+    document.getElementById('history').querySelectorAll('.msg,.nm-hist,.cont-btn').forEach(e => e.remove());
+    document.getElementById('char-pill').textContent = '';
+    document.getElementById('scene-name').textContent = '';
+    document.getElementById('sit-input').value = '';
+  } catch(e) {}
+  // Show setup
   document.getElementById('setup').style.display = 'flex';
-  document.getElementById('experience').style.display = 'none';
 }
 function copyConv() {
   const msgs = document.querySelectorAll('.msg-char,.msg-user');
