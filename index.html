@@ -923,20 +923,20 @@ async function callGroq(userMessage) {
         { role: 'system', content: buildSystemPrompt() },
         ...messages
       ],
-      temperature: 0.72,
-      max_tokens: 280,
+      temperature: 0.6,
+      max_tokens: 400,
       response_format: {
         type: "json_schema",
         json_schema: {
-          name: "english_situation_response",
+          name: "english_situation",
           strict: true,
           schema: {
             type: "object",
             properties: {
               line:            { type: "string" },
               subtitle_es:     { type: "string" },
-              natural_model:   { type: ["string", "null"] },
-              beat_completed:  { type: ["boolean", "null"] },
+              natural_model:   { type: "string" },
+              beat_completed:  { type: "boolean" },
               situation_ended: { type: "boolean" }
             },
             required: ["line","subtitle_es","natural_model","beat_completed","situation_ended"],
