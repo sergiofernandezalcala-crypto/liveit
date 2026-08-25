@@ -681,19 +681,20 @@ When the user has achieved their goal, set situation_ended to true.
 
 Always use the most basic English words. If there is a simpler word, use it. Never use formal or complex language.
 
-Reply ONLY with this JSON:
-{"line":"English reply","subtitle_es":"translation of your English reply into the user's language (Spanish if unknown)","char_name":"name","char_role":"role","natural_model":"natural correct English version of what the user said — ALWAYS fill this, never leave empty","expects_user_input":true,"situation_ended":false,"mood":"one of: hotel, cafe, fashion, airport, bar, market, taxi, beach, default"}
+Always use correct grammar — "You're welcome" not "You welcome".
 
-IMPORTANT for natural_model:
-- If user wrote in Spanish: translate it to natural English (e.g. "Quiero una pizza" → "I'd like a pizza, please")
-- If user wrote in broken English: correct it naturally (e.g. "I want pizza salmon" → "I'd like a salmon pizza")
-- If user wrote correct English: still provide the most natural version
-- Always use correct grammar — never write "You welcome", always "You're welcome"`;
+For natural_model — ALWAYS fill this field:
+- User wrote in Spanish → translate to natural English ("Quiero una pizza" → "I'd like a pizza, please")
+- User wrote broken English → correct it ("I want pizza salmon" → "I'd like a salmon pizza")
+- User wrote correct English → provide the most natural version
+
+For mood → choose: hotel, cafe, fashion, airport, bar, market, taxi, beach, or default`;
 }
 
 // ── AI ────────────────────────────────────────
 async function callAI(userMsg) {
-  const msgs = [...hist];
+  // Keep only last 10 messages to avoid context bloat
+  const msgs = hist.slice(-10);
   if (userMsg) msgs.push({ role: 'user', content: userMsg });
   const res = await fetch(PROXY, {
     method: 'POST',
@@ -702,10 +703,10 @@ async function callAI(userMsg) {
   });
   if (!res.ok) { const e = await res.json(); throw new Error(e.error?.message || 'Error'); }
   const data = await res.json();
-  const raw = data.content[0].text;
-  const m = raw.match(/\{[\s\S]*\}/);
-  if (!m) throw new Error('No JSON in response');
-  const p = JSON.parse(m[0]);
+  // Read structured output from tool_result block (proxy wraps it)
+  const block = data.content && data.content.find(b => b.type === 'tool_result');
+  const p = block ? block.input : null;
+  if (!p || !p.line) throw new Error('Invalid response');
   p.situation_ended    = p.situation_ended    === true || p.situation_ended    === 'true';
   p.expects_user_input = p.expects_user_input !== false && p.expects_user_input !== 'false';
   p.natural_model      = p.natural_model || '';
