@@ -675,9 +675,11 @@ The user's native language may not be Spanish or English — they could be a spe
 
 If the user says something grammatically imperfect, naturally reflect the correct form in your reply without explicitly correcting them.
 
-One short sentence per turn. When delivering something (food, drink, key, change), add a brief natural follow-up question in the same line.
+One very short sentence per turn. Use the simplest English possible — like talking to a child learning the language. Basic words only: yes, no, here, how many, what, your name, please, thank you. No complex vocabulary, no long sentences, no formal language.
 
 When the user has achieved their goal, set situation_ended to true.
+
+Always use the most basic English words. If there is a simpler word, use it. Never use formal or complex language.
 
 Reply ONLY with this JSON:
 {"line":"English reply","subtitle_es":"translation of your English reply into the user's language (Spanish if unknown)","char_name":"name","char_role":"role","natural_model":"natural English of what user tried to say or empty string","expects_user_input":true,"situation_ended":false,"mood":"one of: hotel, cafe, fashion, airport, bar, market, taxi, beach, default"}`;
@@ -939,7 +941,7 @@ function speakAt(text, rate) {
   if (!window.speechSynthesis) return;
   window.speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
-  u.lang = 'en-US'; u.rate = rate || 0.62;
+  u.lang = 'en-US'; u.rate = rate || 0.65;
   const v = voices.find(v => v.lang === 'en-US') || voices.find(v => v.lang.startsWith('en'));
   if (v) u.voice = v;
   window.speechSynthesis.speak(u);
