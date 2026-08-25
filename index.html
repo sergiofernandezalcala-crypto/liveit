@@ -806,6 +806,7 @@ let sessionMemory = {
 };
 let currentBeatIndex = 0;
 let pendingLearningPhrase = null;
+let autoContinuations = 0;
 let subtitleForceVisible = false;
 let recognition = null;
 let isRecording = false;
@@ -913,16 +914,18 @@ Rules:
 - If the user says something grammatically imperfect, reflect the correct form naturally in your reply
 - Never correct explicitly
 - ONE question or action per turn — never ask two things at once
-- NEVER say "let me check", "one moment", "just a moment", "right away" or any phrase that implies waiting — give the result directly
-- Always end your turn with either a question or handing something to the user
-- Keep moving forward: reservation confirmed → ask how many nights → give room info → hand over key → mention breakfast → farewell
+- FORBIDDEN phrases: "let me", "one moment", "just a moment", "right away", "pull up", "check that", "hold on" — never use these
+- When user gives their name, immediately confirm the reservation is found and ask how many nights
+- Always end with a question or giving something to the user
+- Flow: greet → reservation? → name? → confirm + how many nights? → room info + key → breakfast → farewell
 - Maximum 2 short sentences
 - Fill all response fields:
   * line: your English reply (string)
   * subtitle_es: Spanish translation of your reply (string)
   * natural_model: corrected English of what user tried to say, or empty string "" if not needed (string)
   * beat_completed: JSON boolean true when this task completes, JSON boolean false otherwise
-  * situation_ended: JSON boolean true only on farewell, JSON boolean false otherwise`;
+  * situation_ended: JSON boolean true only on farewell, JSON boolean false otherwise
+  * expects_user_input: JSON boolean true if your line naturally invites a user response (question, request), false if it is a statement that requires continuation`;
 }
 
 // ─── LLAMADA A IA (vía proxy → Claude) ────────────
@@ -956,8 +959,9 @@ async function callGroq(userMessage) {
   const parsed = JSON.parse(match[0]);
   parsed.beat_completed  = parsed.beat_completed  === true || parsed.beat_completed  === 'true';
   parsed.situation_ended = parsed.situation_ended === true || parsed.situation_ended === 'true';
-  parsed.natural_model   = parsed.natural_model || '';
-  parsed.subtitle_es     = parsed.subtitle_es || '';
+  parsed.natural_model      = parsed.natural_model || '';
+  parsed.subtitle_es        = parsed.subtitle_es || '';
+  parsed.expects_user_input = parsed.expects_user_input !== false && parsed.expects_user_input !== 'false';
   return parsed;
 }
 
@@ -978,6 +982,7 @@ async function sendMessage() {
   addToHistory('user', text);
   conversationHistory.push({ role: 'user', content: text });
   sessionMemory.totalExchanges++;
+  autoContinuations = 0;
 
   showThinking(true);
 
@@ -1047,6 +1052,41 @@ function processAIResponse(ai) {
     return;
   }
 
+  // Auto-continuación si el modelo no da oportunidad al usuario
+  const expectsInput = ai.expects_user_input !== false;
+  if (!expectsInput && autoContinuations < 1) {
+    autoContinuations++;
+    setTimeout(() => continueSituation(), 1400);
+  } else if (!expectsInput) {
+    showContinueButton();
+  } else {
+    autoContinuations = 0;
+  }
+}
+
+async function continueSituation() {
+  showThinking(true);
+  try {
+    const ai = await callGroq('(continue — advance the situation, ask the user something or hand over the key card)');
+    showThinking(false);
+    processAIResponse(ai);
+  } catch(err) {
+    showThinking(false);
+    showError(err.message);
+  }
+}
+
+function showContinueButton() {
+  const area = document.getElementById('history-area');
+  const thinking = document.getElementById('thinking-indicator');
+  if (document.getElementById('continue-btn')) return;
+  const btn = document.createElement('button');
+  btn.id = 'continue-btn';
+  btn.textContent = 'Continuar →';
+  btn.style.cssText = 'align-self:center;margin:0.5rem auto;padding:0.5rem 1.2rem;background:var(--gold);color:var(--night);border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:0.85rem;';
+  btn.onclick = () => { btn.remove(); continueSituation(); };
+  area.insertBefore(btn, thinking);
+  area.scrollTop = area.scrollHeight;
 }
 
 // ─── SUBTÍTULOS ───────────────────────────────────
