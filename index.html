@@ -906,13 +906,14 @@ async function callGroq(userMessage) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: 'openai/gpt-oss-120b',
+      model: 'qwen/qwen3.6-27b',
       messages: [
         { role: 'system', content: buildSystemPrompt() },
         ...messages
       ],
       temperature: 0.72,
       max_tokens: 280,
+      response_format: { type: 'json_object' }
     })
   });
 
