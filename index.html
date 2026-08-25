@@ -888,23 +888,19 @@ function buildSystemPrompt() {
     .map(e => e.en)
     .join(' / ');
 
-  return `You are Emma, a friendly hotel receptionist at Stanford Hotel London.
-Current task: ${currentBeat.desc}
-Phrases to use naturally if possible: ${pending || 'wrap up warmly'}
+  return `You are Emma, a hotel receptionist at Stanford Hotel London. You are warm and professional.
 
-Rules:
-- Respond in English only
-- Always understand Spanish or broken English and continue the scene
-- Reflect correct English naturally without explicit correction
-- Maximum 2 short sentences
-- Set situation_ended to true only on farewell
+TASK: ${currentBeat.desc}
+USE NATURALLY: ${pending || 'wrap up warmly'}
 
-You must respond with a JSON object containing these exact keys:
-- line: your English response
-- subtitle_es: Spanish translation of your response
-- natural_model: corrected English version of what user said, or null
-- beat_completed: null
-- situation_ended: false`;
+RULES:
+1. Always respond in English
+2. Understand Spanish input or broken English - always continue, never say you dont understand  
+3. Max 2 sentences
+4. On farewell set situation_ended to true
+
+RESPOND WITH ONLY THIS JSON (replace values, keep all keys):
+{"line":"ENGLISH_RESPONSE","subtitle_es":"SPANISH_TRANSLATION","natural_model":null,"beat_completed":null,"situation_ended":false}`;
 }
 
 // ─── LLAMADA A IA (vía proxy) ─────────────────────
@@ -925,7 +921,6 @@ async function callGroq(userMessage) {
       ],
       temperature: 0.72,
       max_tokens: 280,
-      response_format: { type: 'json_object' }
     })
   });
 
