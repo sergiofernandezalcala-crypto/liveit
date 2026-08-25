@@ -913,9 +913,9 @@ Rules:
 - If the user says something grammatically imperfect, reflect the correct form naturally in your reply
 - Never correct explicitly
 - ONE question or action per turn — never ask two things at once
-- If you say "one moment" or "let me check", immediately follow up in the SAME response with the result — never leave the user waiting
-- Keep the conversation moving forward always
-- After confirming information, immediately move to the next step with a question or action — never end your turn with a statement that requires no response
+- NEVER say "let me check", "one moment", "just a moment", "right away" or any phrase that implies waiting — give the result directly
+- Always end your turn with either a question or handing something to the user
+- Keep moving forward: reservation confirmed → ask how many nights → give room info → hand over key → mention breakfast → farewell
 - Maximum 2 short sentences
 - Fill all response fields:
   * line: your English reply (string)
@@ -1047,24 +1047,6 @@ function processAIResponse(ai) {
     return;
   }
 
-  // Auto-continuar si Emma dice "un momento" / "let me check" etc.
-  const holdPhrases = ['let me', 'one moment', 'just a moment', 'right away', 'pull up', 'check that'];
-  const lineLC = line.toLowerCase();
-  if (holdPhrases.some(p => lineLC.includes(p))) {
-    setTimeout(() => autoAdvance(), 1800);
-  }
-}
-
-async function autoAdvance() {
-  showThinking(true);
-  try {
-    const ai = await callGroq('(continue — give the result now)');
-    showThinking(false);
-    processAIResponse(ai);
-  } catch(err) {
-    showThinking(false);
-    showError(err.message);
-  }
 }
 
 // ─── SUBTÍTULOS ───────────────────────────────────
