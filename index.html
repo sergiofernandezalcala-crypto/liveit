@@ -1002,7 +1002,7 @@ function speak(text) {
   if (!window.speechSynthesis) return;
   window.speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
-  u.lang = 'en-US'; u.rate = 0.72; u.pitch = 1.0;
+  u.lang = 'en-US'; u.rate = 0.72; u.pitch = 0.9;
   const v = voices.find(v => v.lang === 'en-US') || voices.find(v => v.lang.startsWith('en'));
   if (v) u.voice = v;
   u.onstart = () => { isSpeaking = true; document.getElementById('speaking-dot').classList.add('on'); };
