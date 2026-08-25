@@ -905,6 +905,8 @@ function buildSystemPrompt() {
 Current task: ${currentBeat.desc}
 Phrases to introduce naturally if possible: ${pending || 'wrap up the conversation warmly'}
 
+You MUST respond with ONLY a raw JSON object. No explanation, no markdown, no code blocks. Start directly with { and end with }.
+
 Rules:
 - Always respond in English as a real receptionist would
 - If the user writes in Spanish or broken English, understand their intention and continue — never say you do not understand
@@ -941,7 +943,6 @@ async function callGroq(userMessage) {
       ],
       temperature: 0.6,
       max_tokens: 400,
-      response_format: { type: "json_object" },
     })
   });
 
