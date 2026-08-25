@@ -216,9 +216,6 @@ textarea.sit-input::placeholder { color: var(--ink3); }
 .avatar-wrap {
   flex-shrink: 0;
   width: 52px; height: 52px;
-  border-radius: 50%;
-  background: var(--ink);
-  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -519,11 +516,11 @@ textarea.sit-input::placeholder { color: var(--ink3); }
     <textarea class="sit-input" id="sit-input" rows="3"
       placeholder="Ej: Acabo de llegar a un hotel en Tokio y necesito hacer el check-in."></textarea>
     <div class="examples">
-      <button class="example-chip" onclick="setExample(this)">☕ Cafetería en Londres</button>
-      <button class="example-chip" onclick="setExample(this)">🏨 Hotel en Nueva York</button>
-      <button class="example-chip" onclick="setExample(this)">🚕 Taxi en Bangkok</button>
-      <button class="example-chip" onclick="setExample(this)">🛒 Tienda en Berlín</button>
-      <button class="example-chip" onclick="setExample(this)">✈️ Aeropuerto en Dubai</button>
+      <button class="example-chip" onclick="setExample(this)">☕ Londres</button>
+      <button class="example-chip" onclick="setExample(this)">🏨 Nueva York</button>
+      <button class="example-chip" onclick="setExample(this)">🚕 Bangkok</button>
+      <button class="example-chip" onclick="setExample(this)">🛒 Berlín</button>
+      <button class="example-chip" onclick="setExample(this)">✈️ Dubai</button>
     </div>
     <button class="btn-go" onclick="startExperience()">Entrar en la situación →</button>
   </div>
@@ -534,7 +531,7 @@ textarea.sit-input::placeholder { color: var(--ink3); }
 <!-- EXPERIENCE -->
 <div id="experience">
   <div class="scene-strip">
-    <button onclick="goHome()" style="background:none;border:none;color:rgba(255,255,255,0.6);cursor:pointer;font-size:1rem;padding:0;margin-right:0.3rem;line-height:1;">←</button>
+    <button onclick="goHome()" style="background:rgba(255,255,255,0.12);border:none;color:white;cursor:pointer;font-size:0.75rem;font-weight:600;font-family:var(--sans);padding:0.3rem 0.7rem;border-radius:20px;margin-right:0.4rem;white-space:nowrap;">← Inicio</button>
     <div class="scene-dot"></div>
     <div class="scene-name" id="scene-name"></div>
     <div class="char-pill" id="char-pill"></div>
@@ -638,7 +635,7 @@ function setExample(btn) {
     '🏨 Hotel en Nueva York': 'Acabo de llegar a un hotel en Nueva York y necesito hacer el check-in.',
     '🚕 Taxi en Bangkok': 'Estoy en Bangkok y quiero coger un taxi al aeropuerto.',
     '🛒 Tienda en Berlín': 'Estoy en una tienda de ropa en Berlín y quiero comprar una chaqueta.',
-    '✈️ Aeropuerto en Dubai': 'Estoy en el aeropuerto de Dubai y no encuentro mi puerta de embarque.'
+    '✈️ Aeropuerto en Dubai': 'Estoy en el aeropuerto de Dubai. No encuentro mi puerta de embarque.'
   };
   document.getElementById('sit-input').value = map[btn.textContent] || btn.textContent;
 }
@@ -660,7 +657,7 @@ function makeAvatar(role) {
   else if (/police|officer/.test(r))                  emoji = '👮';
   else if (/teacher|school/.test(r))                  emoji = '👩‍🏫';
   else if (/nurse/.test(r))                           emoji = '👩‍⚕️';
-  return '<div style="width:52px;height:52px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:1.8rem;">' + emoji + '</div>';
+  return '<div style="width:52px;height:52px;display:flex;align-items:center;justify-content:center;font-size:2.2rem;">' + emoji + '</div>';
 }
 
 // ── PROMPT ────────────────────────────────────
