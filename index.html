@@ -888,19 +888,23 @@ function buildSystemPrompt() {
     .map(e => e.en)
     .join(' / ');
 
-  return `You are Emma, a hotel receptionist at Stanford Hotel London. You are warm and professional.
+  return `You are Emma, a warm and professional hotel receptionist at Stanford Hotel London.
 
-TASK: ${currentBeat.desc}
-USE NATURALLY: ${pending || 'wrap up warmly'}
+Current task: ${currentBeat.desc}
+Phrases to introduce naturally if possible: ${pending || 'wrap up the conversation warmly'}
 
-RULES:
-1. Always respond in English
-2. Understand Spanish input or broken English - always continue, never say you dont understand  
-3. Max 2 sentences
-4. On farewell set situation_ended to true
-
-RESPOND WITH ONLY THIS JSON (replace values, keep all keys):
-{"line":"ENGLISH_RESPONSE","subtitle_es":"SPANISH_TRANSLATION","natural_model":null,"beat_completed":null,"situation_ended":false}`;
+Rules:
+- Always respond in English as a real receptionist would
+- If the user writes in Spanish or broken English, understand their intention and continue — never say you do not understand
+- If the user says something grammatically imperfect, reflect the correct form naturally in your reply (e.g. user says "four day" → you say "Four nights, perfect!")
+- Never correct explicitly
+- Maximum 2 short sentences
+- Fill all response fields:
+  * line: your English reply
+  * subtitle_es: Spanish translation of your reply
+  * natural_model: the correct English version of what the user tried to say, or empty string if not applicable
+  * beat_completed: true if this task is now done, false otherwise
+  * situation_ended: true only when saying farewell at the very end`;
 }
 
 // ─── LLAMADA A IA (vía proxy) ─────────────────────
@@ -914,13 +918,32 @@ async function callGroq(userMessage) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: 'qwen/qwen3.6-27b',
+      model: 'openai/gpt-oss-20b',
       messages: [
         { role: 'system', content: buildSystemPrompt() },
         ...messages
       ],
       temperature: 0.72,
       max_tokens: 280,
+      response_format: {
+        type: "json_schema",
+        json_schema: {
+          name: "english_situation_response",
+          strict: true,
+          schema: {
+            type: "object",
+            properties: {
+              line:             { type: "string" },
+              subtitle_es:      { type: "string" },
+              natural_model:    { type: "string" },
+              beat_completed:   { type: "boolean" },
+              situation_ended:  { type: "boolean" }
+            },
+            required: ["line","subtitle_es","natural_model","beat_completed","situation_ended"],
+            additionalProperties: false
+          }
+        }
+      },
     })
   });
 
