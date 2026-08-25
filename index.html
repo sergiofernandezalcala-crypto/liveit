@@ -670,7 +670,7 @@ function makeAvatar(role) {
 function buildPrompt() {
   return `You are a character in this situation: "${situation}"
 
-Pick the most fitting name and role. Stay in character throughout as a real person would.
+Stay in character throughout as a real person would. Do not introduce yourself by name unless the user asks.
 
 The user's native language may not be Spanish or English — they could be a speaker of any language. Always provide subtitle_es in their native language if possible, but Spanish as fallback. The user may write in any language — always understand and continue. Always understand their intention and continue — never say you don't understand, never break character.
 
@@ -846,8 +846,8 @@ function showContBtn() {
 function applyChar(ai) {
   if (ai.char_name && ai.char_name !== charName) {
     charName = ai.char_name; charRole = ai.char_role || '';
-    document.getElementById('char-name-tag').textContent = charName + (charRole ? ' · ' + charRole : '');
-    document.getElementById('char-pill').textContent = charName;
+    // char-name-tag hidden
+    // char-pill hidden
     document.getElementById('avatar-wrap').innerHTML = makeAvatar(charRole);
   }
   if (ai.mood) applyMood(ai.mood);
@@ -937,7 +937,9 @@ function addMsg(role, text, sub) {
   m.className = 'msg msg-' + (role === 'char' ? 'char' : role === 'user' ? 'user' : 'system');
   if (role === 'char' && sub) {
     m.innerHTML = '<span class="msg-en">' + esc(text) + '</span><span class="msg-sub">' + esc(sub) + '</span>';
-  } else { m.textContent = text; }
+  } else {
+    m.textContent = text;
+  }
   h.insertBefore(m, t);
   h.scrollTop = h.scrollHeight;
 }
