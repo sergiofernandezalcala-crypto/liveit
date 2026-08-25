@@ -392,6 +392,18 @@
     border-bottom-left-radius: 3px;
   }
 
+  .msg-en {
+    display: block;
+  }
+
+  .msg-sub {
+    display: block;
+    font-size: 0.75rem;
+    color: rgba(245,240,232,0.45);
+    margin-top: 0.2rem;
+    font-style: italic;
+  }
+
   .msg-user {
     align-self: flex-end;
     background: rgba(201,168,76,0.15);
@@ -855,7 +867,7 @@ function startExperience() {
 async function openSituation() {
   const opening = SITUATION.opening;
   updateDialogue(opening.line, opening.subtitle, 'full');
-  addToHistory('char', opening.line);
+  addToHistory('char', opening.line, opening.subtitle);
   conversationHistory.push({ role: 'assistant', content: opening.line });
   SITUATION.beats[0].done = true;
   currentBeatIndex = 1;
@@ -992,7 +1004,7 @@ function processAIResponse(ai) {
 
   updateDialogue(line, subtitle, level);
   speak(line);
-  addToHistory('char', line);
+  addToHistory('char', line, subtitle);
   conversationHistory.push({ role: 'assistant', content: line });
 
   // Actualizar memoria de expresiones
@@ -1283,12 +1295,16 @@ function updateMicButton(recording) {
 }
 
 // ─── HISTORIAL ────────────────────────────────────
-function addToHistory(role, text) {
+function addToHistory(role, text, subtitle) {
   const area = document.getElementById('history-area');
   const thinking = document.getElementById('thinking-indicator');
   const msg = document.createElement('div');
   msg.className = `msg msg-${role === 'char' ? 'char' : 'user'}`;
-  msg.textContent = text;
+  if (role === 'char' && subtitle) {
+    msg.innerHTML = `<span class="msg-en">${text}</span><span class="msg-sub">${subtitle}</span>`;
+  } else {
+    msg.textContent = text;
+  }
   area.insertBefore(msg, thinking);
   area.scrollTop = area.scrollHeight;
 }
