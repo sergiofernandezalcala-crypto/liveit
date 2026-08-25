@@ -1044,6 +1044,26 @@ function processAIResponse(ai) {
   // Fin de situación
   if (ai.situation_ended) {
     setTimeout(showEnding, 2200);
+    return;
+  }
+
+  // Auto-continuar si Emma dice "un momento" / "let me check" etc.
+  const holdPhrases = ['let me', 'one moment', 'just a moment', 'right away', 'pull up', 'check that'];
+  const lineLC = line.toLowerCase();
+  if (holdPhrases.some(p => lineLC.includes(p))) {
+    setTimeout(() => autoAdvance(), 1800);
+  }
+}
+
+async function autoAdvance() {
+  showThinking(true);
+  try {
+    const ai = await callGroq('(continue — give the result now)');
+    showThinking(false);
+    processAIResponse(ai);
+  } catch(err) {
+    showThinking(false);
+    showError(err.message);
   }
 }
 
