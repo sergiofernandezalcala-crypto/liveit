@@ -812,6 +812,9 @@ h.scrollTop = h.scrollHeight;
 
 // ── CONTINUATION ──────────────────────────────
 function handleCont(ai) {
+  // If line ends with ? it always expects user input regardless of model flag
+  const hasQuestion = /\?/.test(ai.line || '');
+  if (hasQuestion) { autoCont = 0; return; }
   if (!ai.expects_user_input && autoCont < 1) {
     autoCont++;
     setTimeout(autoContinue, 1200);
