@@ -933,11 +933,11 @@ async function callGroq(userMessage) {
           schema: {
             type: "object",
             properties: {
-              line:             { type: "string" },
-              subtitle_es:      { type: "string" },
-              natural_model:    { type: "string" },
-              beat_completed:   { type: "boolean" },
-              situation_ended:  { type: "boolean" }
+              line:            { type: "string" },
+              subtitle_es:     { type: "string" },
+              natural_model:   { type: ["string", "null"] },
+              beat_completed:  { type: ["boolean", "null"] },
+              situation_ended: { type: "boolean" }
             },
             required: ["line","subtitle_es","natural_model","beat_completed","situation_ended"],
             additionalProperties: false
