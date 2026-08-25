@@ -369,6 +369,7 @@ textarea.sit-input::placeholder { color: var(--ink3); }
 .nm-hist-tag { font-size: 0.58rem; font-weight: 700; color: #007A3D; letter-spacing: 0.08em; text-transform: uppercase; display: block; }
 .nm-hist-phrase { font-size: 0.82rem; color: #007A3D; font-style: italic; font-weight: 500; display: block; }
 .nm-hist-actions { display: flex; gap: 0.4rem; margin-top: 0.35rem; }
+.nm-hist-user { display: block; font-size: 0.78rem; color: #555; margin-bottom: 0.25rem; font-style: normal; }
 
 .thinking {
   display: none;
@@ -755,7 +756,7 @@ async function send() {
     showLine(ai.line, ai.subtitle_es);
     addMsg('char', ai.line, ai.subtitle_es);
     hist.push({ role: 'assistant', content: ai.line });
-    if (ai.natural_model) showNM(ai.natural_model);
+    if (ai.natural_model) showNM(ai.natural_model, lastUserMsg);
     handleCont(ai);
   } catch(e) {
     showThinking(false);
@@ -768,7 +769,7 @@ async function send() {
       showLine(ai2.line, ai2.subtitle_es);
       addMsg('char', ai2.line, ai2.subtitle_es);
       hist.push({ role: 'assistant', content: ai2.line });
-      if (ai2.natural_model) showNM(ai2.natural_model);
+      if (ai2.natural_model) showNM(ai2.natural_model, lastUserMsg);
       handleCont(ai2);
     } catch(e2) {
       showThinking(false);
@@ -789,7 +790,7 @@ btn.onclick = async () => {
       showLine(ai3.line, ai3.subtitle_es);
       addMsg('char', ai3.line, ai3.subtitle_es);
       hist.push({ role: 'assistant', content: ai3.line });
-      if (ai3.natural_model) showNM(ai3.natural_model);
+      // no natural_model in auto-continue
       handleCont(ai3);
     } catch(e3) {
       showThinking(false);
@@ -893,20 +894,31 @@ function revealSub() {
 }
 
 // ── NM ────────────────────────────────────────
-function showNM(phrase) {
+function showNM(phrase, userText) {
+  // Don't show if phrase is empty or same as what personaje just said
+  if (!phrase || phrase.length < 3) return;
   nmPhrase = phrase;
   const h = document.getElementById('history');
   const t = document.getElementById('thinking');
+
+  // Avoid duplicates - don't add if same phrase already shown
+  const existing = h.querySelectorAll('.nm-hist .nm-hist-phrase');
+  for (const el of existing) {
+    if (el.textContent.replace(/[""]/g, '').trim() === phrase.trim()) return;
+  }
+
   const card = document.createElement('div');
   card.className = 'nm-hist';
   card.innerHTML = 
-    '<span class="nm-hist-tag">Así se dice en inglés</span>' +
-    '<span class="nm-hist-phrase">“' + phrase + '”</span>' +
+    (userText ? '<span class="nm-hist-user">' + esc(userText) + '</span>' : '') +
+    '<span class="nm-hist-tag">En inglés</span>' +
+    '<span class="nm-hist-phrase">“' + esc(phrase) + '”</span>' +
     '<div class="nm-hist-actions">' +
       '<button class="nm-btn nm-listen" onclick="listenNM()">🔊 Escuchar</button>' +
       (recognition ? '<button class="nm-btn nm-listen" onclick="repeatNM()">🎙 Repetir</button>' : '') +
     '</div>';
-  // Insert right after the last user message, before thinking indicator
+
+  // Insert right after the last user message
   const userMsgs = h.querySelectorAll('.msg-user');
   const lastUser = userMsgs[userMsgs.length - 1];
   if (lastUser && lastUser.nextSibling) {
