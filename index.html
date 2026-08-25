@@ -281,17 +281,66 @@
 
   /* MODELO NATURAL (corrección suave) */
   .natural-model {
-    margin-top: 0.5rem;
-    padding: 0.4rem 0.7rem;
+    margin-top: 0.6rem;
+    padding: 0.6rem 0.9rem;
     background: var(--gold-dim);
-    border-left: 2px solid var(--gold);
-    border-radius: 0 6px 6px 0;
-    font-size: 0.82rem;
-    color: var(--gold);
+    border-left: 3px solid var(--gold);
+    border-radius: 0 8px 8px 0;
     display: none;
+    flex-direction: column;
+    gap: 0.35rem;
   }
 
-  .natural-model.visible { display: block; animation: fadeIn 0.4s ease; }
+  .natural-model.visible { 
+    display: flex; 
+    animation: slideUp 0.35s ease; 
+  }
+
+  .natural-model-label {
+    font-size: 0.65rem;
+    color: var(--gold);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    opacity: 0.7;
+  }
+
+  .natural-model-phrase {
+    font-size: 1.05rem;
+    color: var(--gold);
+    font-weight: 500;
+    letter-spacing: 0.01em;
+  }
+
+  .natural-model-actions {
+    display: flex;
+    gap: 0.4rem;
+    margin-top: 0.2rem;
+  }
+
+  .nm-btn {
+    padding: 0.28rem 0.7rem;
+    border-radius: 5px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: opacity 0.2s;
+    font-family: var(--font-body);
+  }
+
+  .nm-btn-listen {
+    background: rgba(201,168,76,0.25);
+    color: var(--gold);
+    border: 1px solid rgba(201,168,76,0.4);
+  }
+
+  .nm-btn-skip {
+    background: transparent;
+    color: var(--ghost);
+    border: 1px solid var(--border);
+  }
+
+  .nm-btn:hover { opacity: 0.75; }
 
   /* ─── ZONA DE APRENDIZAJE VOLUNTARIO ─────────── */
   .learning-panel {
@@ -676,7 +725,15 @@
     <button class="subtitle-btn" id="subtitle-toggle" style="display:none" onclick="toggleSubtitle()">
       ¿qué significa?
     </button>
-    <div class="natural-model" id="natural-model"></div>
+    <div class="natural-model" id="natural-model">
+      <div class="natural-model-label">Así se dice en inglés</div>
+      <div class="natural-model-phrase" id="nm-phrase"></div>
+      <div class="natural-model-actions">
+        <button class="nm-btn nm-btn-listen" onclick="listenNaturalModel()">🔊 Escuchar</button>
+        <button class="nm-btn nm-btn-listen" onclick="repeatNaturalModel()" id="nm-repeat-btn">🎙 Repetir</button>
+        <button class="nm-btn nm-btn-skip" onclick="hideNaturalModel()">Continuar</button>
+      </div>
+    </div>
   </div>
 
   <!-- PANEL DE APRENDIZAJE VOLUNTARIO -->
@@ -1245,14 +1302,41 @@ function getSubtitleForLine(line) {
 }
 
 // ─── MODELO NATURAL ───────────────────────────────
+let currentNaturalModel = '';
+
 function showNaturalModel(phrase) {
-  const el = document.getElementById('natural-model');
-  el.textContent = `💬 "${phrase}"`;
-  el.classList.add('visible');
+  if (!phrase) return;
+  currentNaturalModel = phrase;
+  document.getElementById('nm-phrase').textContent = '"' + phrase + '"';
+  document.getElementById('natural-model').classList.add('visible');
+  // Show repeat button only if STT available
+  document.getElementById('nm-repeat-btn').style.display = recognition ? 'inline-block' : 'none';
+  // Also add it to history as a subtle card
+  addNaturalModelToHistory(phrase);
 }
 
 function hideNaturalModel() {
   document.getElementById('natural-model').classList.remove('visible');
+}
+
+function listenNaturalModel() {
+  if (currentNaturalModel) speakPhrase(currentNaturalModel, 0.68);
+}
+
+function repeatNaturalModel() {
+  if (!recognition || !currentNaturalModel) return;
+  startSTT(false);
+}
+
+function addNaturalModelToHistory(phrase) {
+  const area = document.getElementById('history-area');
+  const thinking = document.getElementById('thinking-indicator');
+  const card = document.createElement('div');
+  card.style.cssText = 'align-self:flex-end;max-width:85%;padding:0.4rem 0.75rem;background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);border-radius:8px;display:flex;flex-direction:column;gap:0.15rem;animation:fadeIn 0.3s ease;';
+  card.innerHTML = '<span style="font-size:0.6rem;color:var(--gold);letter-spacing:0.1em;text-transform:uppercase;opacity:0.6">Así se dice</span>' +
+    '<span style="font-size:0.88rem;color:var(--gold);font-style:italic;">&ldquo;' + phrase + '&rdquo;</span>';
+  area.insertBefore(card, thinking);
+  area.scrollTop = area.scrollHeight;
 }
 
 // ─── PANEL DE APRENDIZAJE ─────────────────────────
