@@ -1,439 +1,562 @@
 <!DOCTYPE html>
-<!-- v2.0 — motor libre, sin estructura prefijada -->
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Live It</title>
 <style>
-  :root {
-    --night:    #f0ede6;
-    --deep:     #faf8f4;
-    --surface:  #ffffff;
-    --panel:    #f5f2eb;
-    --border:   rgba(0,0,0,0.09);
-    --gold:     #e8440a;
-    --gold-dim: rgba(232,68,10,0.1);
-    --cream:    #1a1208;
-    --muted:    rgba(26,18,8,0.5);
-    --ghost:    rgba(26,18,8,0.25);
-    --red:      #e8440a;
-    --radius:   14px;
-    --font-display: 'Georgia', serif;
-    --font-body: system-ui, -apple-system, sans-serif;
-    --accent2:  #0057ff;
-    --accent3:  #00b87a;
-  }
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Serif+Display&display=swap');
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  body {
-    background: var(--night);
-    color: var(--cream);
-    font-family: var(--font-body);
-    height: 100dvh;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    -webkit-font-smoothing: antialiased;
-  }
+:root {
+  --ink:     #111111;
+  --ink2:    #555555;
+  --ink3:    #999999;
+  --paper:   #FAFAF8;
+  --white:   #FFFFFF;
+  --lime:    #00E676;
+  --lime-dk: #00C853;
+  --sky:     #E8FFF2;
+  --coral:   #00E676;
+  --border:  #E8E8E4;
+  --r:       12px;
+  --sans:    'DM Sans', system-ui, sans-serif;
+  --serif:   'DM Serif Display', Georgia, serif;
+}
 
-  /* ── SETUP ─────────────────────────────────────── */
-  #setup-screen {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100dvh;
-    padding: 2rem;
-    background: linear-gradient(160deg, #fff8f0 0%, #ffeedd 100%);
-  }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
 
-  .logo { font-family: var(--font-display); font-size: 2.8rem; color: #e8440a; margin-bottom: 0.3rem; letter-spacing: -0.02em; }
-  .tagline { font-size: 0.82rem; color: rgba(26,18,8,0.45); letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 3rem; }
+/* ── SETUP ─────────────────────────────────── */
+#setup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100dvh;
+  padding: 1.5rem;
+  background: var(--white);
+}
 
-  .setup-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 2rem;
-    width: 100%;
-    max-width: 420px;
-    box-shadow: 0 8px 40px rgba(232,68,10,0.1), 0 2px 8px rgba(0,0,0,0.06);
-  }
+.setup-top {
+  width: 100%;
+  max-width: 400px;
+  margin-bottom: auto;
+  padding-top: 2rem;
+}
 
-  .setup-card h2 { font-size: 1rem; font-weight: 600; margin-bottom: 0.4rem; }
-  .setup-card p  { font-size: 0.82rem; color: var(--muted); line-height: 1.5; margin-bottom: 1rem; }
+.wordmark {
+  font-family: var(--serif);
+  font-size: 3.2rem;
+  line-height: 1;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+}
 
-  .situation-input {
-    width: 100%;
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 0.75rem 1rem;
-    color: var(--cream);
-    font-size: 0.88rem;
-    font-family: var(--font-body);
-    line-height: 1.5;
-    outline: none;
-    resize: none;
-    transition: border-color 0.3s;
-  }
-  .situation-input:focus { border-color: var(--gold); }
-  .situation-input::placeholder { color: var(--ghost); }
+.wordmark span {
+  color: #00E676;
+}
 
-  .btn-primary {
-    width: 100%;
-    margin-top: 1rem;
-    padding: 0.85rem;
-    background: #ff6b35;
-    color: var(--night);
-    border: none;
-    border-radius: 8px;
-    font-size: 0.95rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: opacity 0.2s;
-  }
-  .btn-primary:hover { opacity: 0.85; }
-  .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; }
+.sub {
+  margin-top: 0.3rem;
+  font-size: 0.8rem;
+  color: var(--ink3);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
 
-  .setup-note { margin-top: 1.5rem; font-size: 0.72rem; color: var(--ghost); text-align: center; line-height: 1.6; }
+.setup-main {
+  width: 100%;
+  max-width: 400px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.75rem;
+}
 
-  /* ── EXPERIENCE ─────────────────────────────────── */
-  #experience-screen {
-    display: none;
-    flex-direction: column;
-    height: 100dvh;
-  }
+.setup-label {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--ink);
+}
 
-  /* Scene header */
-  .scene-header {
-    flex-shrink: 0;
-    height: 200px;
-    position: relative;
-    overflow: hidden;
-    background: linear-gradient(135deg, #ff6b35 0%, #f7c59f 40%, #fffffc 100%);
-    transition: background 1s ease;
-  }
+.setup-hint {
+  font-size: 0.82rem;
+  color: var(--ink2);
+  line-height: 1.5;
+  margin-top: -0.25rem;
+}
 
-  .scene-overlay {
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(ellipse at 80% 20%, rgba(0,87,255,0.08) 0%, transparent 50%);
-  }
+textarea.sit-input {
+  width: 100%;
+  background: var(--paper);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r);
+  padding: 0.9rem 1rem;
+  font-size: 0.9rem;
+  font-family: var(--sans);
+  color: var(--ink);
+  line-height: 1.55;
+  resize: none;
+  outline: none;
+  transition: border-color 0.2s;
+}
+textarea.sit-input:focus { border-color: var(--ink); }
+textarea.sit-input::placeholder { color: var(--ink3); }
 
-  .scene-location {
-    position: absolute;
-    top: 1rem;
-    left: 1.2rem;
-    font-size: 0.68rem;
-    color: #e8440a;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    font-weight: 700;
-    background: rgba(255,255,255,0.7);
-    padding: 0.2rem 0.5rem;
-    border-radius: 20px;
-  }
+.examples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
 
-  .character-wrap {
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
+.example-chip {
+  padding: 0.3rem 0.75rem;
+  background: #E8FFF2;
+  border: none;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  color: var(--ink2);
+  cursor: pointer;
+  font-family: var(--sans);
+  transition: background 0.15s;
+}
+.example-chip:hover { background: #C8F5DC; }
 
-  .char-avatar { width: 88px; height: 88px; }
-  .char-label {
-    font-size: 0.63rem;
-    color: #e8440a;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    opacity: 0.65;
-    margin-top: 0.2rem;
-    margin-bottom: 0.4rem;
-  }
+.btn-go {
+  width: 100%;
+  padding: 1rem;
+  background: var(--lime);
+  color: var(--ink);
+  border: none;
+  border-radius: var(--r);
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: var(--sans);
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+.btn-go:hover { background: var(--lime-dk); }
+.btn-go:active { transform: scale(0.98); }
 
-  /* Dialogue */
-  .dialogue-wrap {
-    flex-shrink: 0;
-    background: var(--surface);
-    border-bottom: 2px solid #ff6b35;
-    padding: 1rem 1.2rem 0.8rem;
-    min-height: 85px;
-    position: relative;
-  }
+.setup-bottom {
+  width: 100%;
+  max-width: 400px;
+  margin-top: auto;
+  padding-bottom: 1.5rem;
+  font-size: 0.72rem;
+  color: var(--ink3);
+  text-align: center;
+}
 
-  .speaking-dot {
-    position: absolute;
-    top: 0.8rem; right: 1.2rem;
-    width: 7px; height: 7px;
-    border-radius: 50%;
-    background: #ff6b35;
-    display: none;
-  }
-  .speaking-dot.on { display: block; animation: blink 0.9s ease infinite; }
-  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.15} }
+/* ── EXPERIENCE ─────────────────────────────── */
+#experience {
+  display: none;
+  flex-direction: column;
+  height: 100dvh;
+  background: var(--white);
+}
 
-  .char-line {
-    font-size: 1.1rem;
-    line-height: 1.45;
-    color: var(--cream);
-    min-height: 1.5em;
-  }
-  .char-line.pop { animation: pop 0.35s ease; }
-  @keyframes pop { from{opacity:0.3;transform:translateY(3px)} to{opacity:1;transform:translateY(0)} }
+/* Scene strip */
+.scene-strip {
+  flex-shrink: 0;
+  height: 56px;
+  background: var(--ink);
+  display: flex;
+  align-items: center;
+  padding: 0 1rem;
+  gap: 0.75rem;
+}
 
-  .subtitle {
-    margin-top: 0.3rem;
-    font-size: 0.8rem;
-    line-height: 1.4;
-    transition: all 0.5s;
-  }
-  .subtitle.full { color: rgba(26,18,8,0.55); }
-  .subtitle.soft { color: rgba(26,18,8,0.3); font-size: 0.72rem; }
-  .subtitle.hidden { display: none; }
+.scene-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--lime);
+  flex-shrink: 0;
+}
 
-  .subtitle-reveal {
-    display: none;
-    margin-top: 0.25rem;
-    font-size: 0.68rem;
-    color: var(--gold);
-    opacity: 0.5;
-    cursor: pointer;
-    background: none;
-    border: none;
-    padding: 0;
-    font-family: var(--font-body);
-  }
-  .subtitle-reveal:hover { opacity: 1; }
+.scene-name {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.7);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
-  /* Natural model card */
-  .nm-card {
-    display: none;
-    margin-top: 0.6rem;
-    padding: 0.55rem 0.85rem;
-    background: var(--gold-dim);
-    border-left: 3px solid var(--accent2);
-    border-radius: 0 8px 8px 0;
-    flex-direction: column;
-    gap: 0.3rem;
-    animation: fadeIn 0.3s ease;
-  }
-  .nm-card.on { display: flex; }
-  .nm-label { font-size: 0.6rem; color: var(--accent2); letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.8; font-weight: 700; }
-  .nm-phrase { font-size: 1rem; color: var(--accent2); font-weight: 600; }
-  .nm-actions { display: flex; gap: 0.4rem; margin-top: 0.15rem; }
-  .nm-btn {
-    padding: 0.25rem 0.65rem;
-    border-radius: 5px;
-    font-size: 0.7rem;
-    font-weight: 600;
-    cursor: pointer;
-    border: none;
-    font-family: var(--font-body);
-    transition: opacity 0.2s;
-  }
-  .nm-btn:hover { opacity: 0.7; }
-  .nm-btn-listen { background: rgba(0,87,255,0.1); color: var(--accent2); border: 1px solid rgba(0,87,255,0.25); }
-  .nm-btn-skip   { background: transparent; color: var(--ghost); border: 1px solid var(--border); }
+.char-pill {
+  font-size: 0.72rem;
+  color: var(--lime);
+  font-weight: 600;
+  white-space: nowrap;
+}
 
-  /* History */
-  .history {
-    flex: 1;
-    overflow-y: auto;
-    padding: 0.8rem 1.2rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.45rem;
-    background: var(--deep);
-  }
-  .history::-webkit-scrollbar { width: 3px; }
-  .history::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+/* Avatar + dialogue */
+.char-area {
+  flex-shrink: 0;
+  display: flex;
+  gap: 0.75rem;
+  padding: 1rem 1rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--white);
+  min-height: 110px;
+}
 
-  .msg {
-    max-width: 84%;
-    padding: 0.5rem 0.8rem;
-    border-radius: 12px;
-    font-size: 0.84rem;
-    line-height: 1.45;
-    animation: fadeIn 0.3s ease;
-  }
-  @keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
+.avatar-wrap {
+  flex-shrink: 0;
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  background: var(--ink);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-  .msg-char { align-self: flex-start; background: #f0ede6; border-bottom-left-radius: 3px; border: 1px solid rgba(0,0,0,0.06); }
-  .msg-user { align-self: flex-end; background: #e8440a; color: white; border-bottom-right-radius: 3px; }
-  .msg-system { align-self: center; font-size: 0.7rem; color: var(--ghost); text-align: center; background: transparent; padding: 0.15rem; }
+.avatar-wrap svg { width: 52px; height: 52px; }
 
-  .msg-en { display: block; }
-  .msg-sub { display: block; font-size: 0.73rem; color: rgba(26,18,8,0.4); margin-top: 0.18rem; font-style: italic; }
+.dialogue-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
 
-  .nm-history {
-    align-self: flex-end;
-    max-width: 84%;
-    padding: 0.38rem 0.72rem;
-    background: rgba(0,184,122,0.07);
-    border: 1px solid rgba(0,184,122,0.2);
-    border-radius: 8px;
-    display: flex;
-    flex-direction: column;
-    gap: 0.1rem;
-    animation: fadeIn 0.3s ease;
-  }
-  .nm-history-label { font-size: 0.58rem; color: var(--accent3); letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.7; font-weight: 700; }
-  .nm-history-phrase { font-size: 0.84rem; color: var(--accent3); font-style: italic; font-weight: 500; }
+.char-name-tag {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--ink3);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
 
-  /* Thinking */
-  .thinking {
-    display: none;
-    align-items: center;
-    gap: 4px;
-    padding: 0.38rem 0.65rem;
-    background: var(--surface);
-    border-radius: 12px;
-    border-bottom-left-radius: 3px;
-    align-self: flex-start;
-  }
-  .thinking.on { display: flex; background: #f0ede6; border: 1px solid rgba(0,0,0,0.06); }
-  .thinking span {
-    width: 5px; height: 5px;
-    background: rgba(26,18,8,0.3);
-    border-radius: 50%;
-    animation: bounce 1.2s ease infinite;
-  }
-  .thinking span:nth-child(2) { animation-delay: 0.2s; }
-  .thinking span:nth-child(3) { animation-delay: 0.4s; }
-  @keyframes bounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-5px)} }
+.char-line {
+  font-size: 1.05rem;
+  line-height: 1.45;
+  color: var(--ink);
+  font-weight: 500;
+}
+.char-line.pop { animation: pop 0.3s ease; }
+@keyframes pop { from{opacity:0;transform:translateY(2px)} to{opacity:1;transform:translateY(0)} }
 
-  /* Input */
-  .input-zone {
-    flex-shrink: 0;
-    background: var(--surface);
-    border-top: 1px solid var(--border);
-    padding: 0.7rem 1rem;
-  }
+.subtitle {
+  font-size: 0.8rem;
+  color: var(--ink3);
+  font-style: italic;
+  line-height: 1.4;
+  transition: all 0.4s;
+}
+.subtitle.hidden { display: none; }
+.subtitle.soft { opacity: 0.5; }
 
-  .input-row { display: flex; align-items: center; gap: 0.5rem; }
+.sub-reveal {
+  background: none;
+  border: none;
+  font-size: 0.68rem;
+  color: var(--lime);
+  cursor: pointer;
+  font-family: var(--sans);
+  padding: 0;
+  margin-top: 0.1rem;
+  display: none;
+}
 
-  .text-input {
-    flex: 1;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 22px;
-    padding: 0.62rem 1rem;
-    color: var(--cream);
-    font-size: 0.88rem;
-    font-family: var(--font-body);
-    outline: none;
-    resize: none;
-    transition: border-color 0.3s;
-  }
-  .text-input:focus { border-color: var(--gold); }
-  .text-input::placeholder { color: var(--ghost); }
+.speaking-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--coral);
+  display: none;
+  animation: blink 0.8s ease infinite;
+  flex-shrink: 0;
+  margin-top: 0.6rem;
+}
+.speaking-dot.on { display: block; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.1} }
 
-  .btn-mic, .btn-send {
-    width: 40px; height: 40px;
-    border-radius: 50%;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    transition: all 0.2s;
-  }
-  .btn-mic { background: var(--surface); border: 1px solid var(--border); color: var(--muted); }
-  .btn-mic.rec { background: var(--red); border-color: var(--red); color: white; animation: mic-pulse 1s ease infinite; }
-  @keyframes mic-pulse { 0%,100%{box-shadow:0 0 0 0 rgba(224,92,92,0.4)} 50%{box-shadow:0 0 0 8px rgba(224,92,92,0)} }
-  .btn-send { background: var(--gold); color: var(--night); }
-  .btn-send:hover { opacity: 0.85; }
-  .btn-send:disabled { opacity: 0.3; cursor: default; }
-  .btn-mic svg, .btn-send svg { width: 17px; height: 17px; }
+/* NM card */
+.nm-card {
+  display: none;
+  margin: 0.5rem 1rem 0;
+  padding: 0.6rem 0.85rem;
+  background: #F0FFF6;
+  border: 1.5px solid #00E676;
+  border-radius: var(--r);
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.nm-card.on { display: flex; }
+.nm-tag { font-size: 0.6rem; font-weight: 700; color: #007A3D; letter-spacing: 0.1em; text-transform: uppercase; }
+.nm-phrase { font-size: 0.97rem; font-weight: 600; color: #007A3D; }
+.nm-actions { display: flex; gap: 0.4rem; margin-top: 0.1rem; }
+.nm-btn {
+  padding: 0.22rem 0.65rem;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  font-family: var(--sans);
+  transition: opacity 0.15s;
+}
+.nm-btn:hover { opacity: 0.75; }
+.nm-listen { background: #00E676; color: white; }
+.nm-skip   { background: transparent; color: var(--ink3); border: 1px solid var(--border); }
 
-  .hint { margin-top: 0.35rem; font-size: 0.67rem; color: var(--ghost); text-align: center; }
+/* History */
+.history {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.9rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  background: var(--paper);
+}
+.history::-webkit-scrollbar { width: 3px; }
+.history::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
-  /* Ending */
-  #ending-screen {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(240,237,230,0.97);
-    z-index: 100;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem;
-    text-align: center;
-    animation: fadeIn 0.5s ease;
-  }
-  .ending-icon { font-size: 2.8rem; margin-bottom: 1rem; }
-  .ending-title { font-family: var(--font-display); font-size: 1.5rem; color: #e8440a; margin-bottom: 0.5rem; }
-  .ending-msg { font-size: 0.88rem; color: var(--muted); line-height: 1.6; max-width: 300px; margin-bottom: 1.8rem; }
-  .ending-actions { display: flex; flex-direction: column; gap: 0.6rem; width: 100%; max-width: 280px; }
-  .btn-secondary {
-    padding: 0.8rem;
-    background: var(--surface);
-    color: var(--cream);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    font-size: 0.88rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: opacity 0.2s;
-  }
-  .btn-secondary:hover { opacity: 0.75; }
+.msg {
+  max-width: 82%;
+  padding: 0.55rem 0.85rem;
+  border-radius: 14px;
+  font-size: 0.84rem;
+  line-height: 1.45;
+  animation: fadeIn 0.25s ease;
+}
+@keyframes fadeIn { from{opacity:0;transform:translateY(3px)} to{opacity:1;transform:translateY(0)} }
+
+.msg-char {
+  align-self: flex-start;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-bottom-left-radius: 3px;
+  color: var(--ink);
+}
+.msg-user {
+  align-self: flex-end;
+  background: var(--ink);
+  color: white;
+  border-bottom-right-radius: 3px;
+}
+.msg-system {
+  align-self: center;
+  font-size: 0.7rem;
+  color: var(--ink3);
+  background: transparent;
+  padding: 0.1rem;
+}
+
+.msg-en { display: block; }
+.msg-sub { display: block; font-size: 0.72rem; color: var(--ink3); margin-top: 0.15rem; font-style: italic; }
+
+.nm-hist {
+  align-self: flex-end;
+  max-width: 82%;
+  padding: 0.4rem 0.75rem;
+  background: #F0FFF6;
+  border: 1px solid #00E676;
+  border-radius: 10px;
+  border-bottom-right-radius: 3px;
+  animation: fadeIn 0.25s ease;
+}
+.nm-hist-tag { font-size: 0.58rem; font-weight: 700; color: #007A3D; letter-spacing: 0.08em; text-transform: uppercase; display: block; }
+.nm-hist-phrase { font-size: 0.82rem; color: #007A3D; font-style: italic; font-weight: 500; display: block; }
+
+.thinking {
+  display: none;
+  align-self: flex-start;
+  align-items: center;
+  gap: 4px;
+  padding: 0.4rem 0.65rem;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  border-bottom-left-radius: 3px;
+}
+.thinking.on { display: flex; }
+.thinking span {
+  width: 5px; height: 5px;
+  background: var(--ink3);
+  border-radius: 50%;
+  animation: bounce 1.1s ease infinite;
+}
+.thinking span:nth-child(2) { animation-delay: 0.18s; }
+.thinking span:nth-child(3) { animation-delay: 0.36s; }
+@keyframes bounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-4px)} }
+
+.cont-btn {
+  align-self: center;
+  padding: 0.4rem 1rem;
+  background: var(--lime); color: white;
+  color: var(--ink);
+  border: none;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: var(--sans);
+}
+
+/* Input */
+.input-zone {
+  flex-shrink: 0;
+  background: var(--white);
+  border-top: 1px solid var(--border);
+  padding: 0.65rem 0.9rem;
+}
+
+.input-row { display: flex; align-items: center; gap: 0.45rem; }
+
+.text-input {
+  flex: 1;
+  background: var(--paper);
+  border: 1.5px solid var(--border);
+  border-radius: 22px;
+  padding: 0.6rem 1rem;
+  color: var(--ink);
+  font-size: 0.88rem;
+  font-family: var(--sans);
+  outline: none;
+  resize: none;
+  transition: border-color 0.2s;
+}
+.text-input:focus { border-color: var(--ink); }
+.text-input::placeholder { color: var(--ink3); }
+
+.btn-mic, .btn-send {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+.btn-mic { background: var(--paper); border: 1.5px solid var(--border); color: var(--ink2); }
+.btn-mic.rec { background: #FF3B30; border-color: #FF3B30; color: white; }
+.btn-send { background: var(--ink); color: white; }
+.btn-send:hover { opacity: 0.8; }
+.btn-send:disabled { opacity: 0.25; }
+.btn-mic svg, .btn-send svg { width: 16px; height: 16px; }
+
+.hint { margin-top: 0.3rem; font-size: 0.66rem; color: var(--ink3); text-align: center; }
+
+/* Ending */
+#ending {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: var(--white);
+  z-index: 100;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+  animation: fadeIn 0.4s ease;
+}
+.ending-badge {
+  width: 64px; height: 64px;
+  background: var(--lime);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  margin-bottom: 1.2rem;
+}
+.ending-title { font-family: var(--serif); font-size: 1.8rem; color: var(--ink); margin-bottom: 0.5rem; }
+.ending-sub { font-size: 0.88rem; color: var(--ink2); line-height: 1.6; max-width: 280px; margin-bottom: 2rem; }
+.ending-acts { display: flex; flex-direction: column; gap: 0.6rem; width: 100%; max-width: 260px; }
+.btn-new { padding: 0.9rem; background: var(--lime); color: var(--ink); border: none; border-radius: var(--r); font-size: 0.95rem; font-weight: 700; cursor: pointer; font-family: var(--sans); }
+.btn-copy { padding: 0.8rem; background: transparent; color: var(--ink2); border: 1.5px solid var(--border); border-radius: var(--r); font-size: 0.88rem; font-weight: 600; cursor: pointer; font-family: var(--sans); }
+
+/* ── MOOD PALETTES ───────────────────────────── */
+.mood-hotel    { --scene-a: #0f2027; --scene-b: #203a43; --scene-c: #2c5364; --scene-txt: #c9a84c; }
+.mood-cafe     { --scene-a: #2c1503; --scene-b: #6b3a1f; --scene-c: #c8793a; --scene-txt: #ffd9a8; }
+.mood-fashion  { --scene-a: #1a0a1e; --scene-b: #4a1560; --scene-c: #9b30c0; --scene-txt: #f0c6ff; }
+.mood-airport  { --scene-a: #071330; --scene-b: #0d2b6b; --scene-c: #1565c0; --scene-txt: #90caf9; }
+.mood-bar      { --scene-a: #1a0000; --scene-b: #4a0a0a; --scene-c: #8b1a1a; --scene-txt: #ffb347; }
+.mood-market   { --scene-a: #0d2600; --scene-b: #1b5e20; --scene-c: #388e3c; --scene-txt: #b9f6ca; }
+.mood-taxi     { --scene-a: #1a1500; --scene-b: #4a3f00; --scene-c: #f9a825; --scene-txt: #fff9c4; }
+.mood-beach    { --scene-a: #003d6b; --scene-b: #0077b6; --scene-c: #48cae4; --scene-txt: #ffe0a3; }
+.mood-default  { --scene-a: #111111; --scene-b: #2a2a2a; --scene-c: #444444; --scene-txt: #00E676; }
+
+.scene-strip {
+  background: linear-gradient(90deg, var(--scene-a) 0%, var(--scene-b) 60%, var(--scene-c) 100%) !important;
+  transition: background 0.8s ease;
+}
+
+.scene-dot { background: var(--scene-txt) !important; }
+.char-pill { color: var(--scene-txt) !important; }
 </style>
 </head>
 <body>
 
 <!-- SETUP -->
-<div id="setup-screen">
-  <div class="logo">Live It</div>
-  <div class="tagline">No quieres estudiarlo. Quieres vivirlo.</div>
-
-  <div class="setup-card">
-    <h2>¿Dónde quieres estar?</h2>
-    <p>Describe tu situación. El personaje hablará en inglés. Tú responde como quieras.</p>
-    <textarea
-      id="situation-input"
-      class="situation-input"
-      rows="3"
-      placeholder="Ej: Acabo de llegar a un hotel en Tokio y necesito hacer el check-in."
-    ></textarea>
-    <button class="btn-primary" onclick="startExperience()">Vivir esta situación →</button>
+<div id="setup">
+  <div class="setup-top">
+    <div class="wordmark">Live <span>It</span></div>
+    <div class="sub">Inglés vivido, no estudiado</div>
   </div>
 
-  <p class="setup-note">Puedes escribir en español en cualquier momento.<br>La situación nunca se detiene.</p>
+  <div class="setup-main">
+    <div class="setup-label">¿Dónde quieres estar?</div>
+    <div class="setup-hint">Describe la situación. El personaje hablará en inglés. Tú responde como quieras.</div>
+    <textarea class="sit-input" id="sit-input" rows="3"
+      placeholder="Ej: Acabo de llegar a un hotel en Tokio y necesito hacer el check-in."></textarea>
+    <div class="examples">
+      <button class="example-chip" onclick="setExample(this)">☕ Cafetería en Londres</button>
+      <button class="example-chip" onclick="setExample(this)">🏨 Hotel en Nueva York</button>
+      <button class="example-chip" onclick="setExample(this)">🚕 Taxi en Bangkok</button>
+      <button class="example-chip" onclick="setExample(this)">🛒 Tienda en Berlín</button>
+      <button class="example-chip" onclick="setExample(this)">✈️ Aeropuerto en Dubai</button>
+    </div>
+    <button class="btn-go" onclick="startExperience()">Entrar en la situación →</button>
+  </div>
+
+  <div class="setup-bottom" id="lang-hint-setup"></div>
 </div>
 
 <!-- EXPERIENCE -->
-<div id="experience-screen">
-  <div class="scene-header" id="scene-header">
-    <div class="scene-overlay"></div>
-    <div class="scene-location" id="scene-location"></div>
-    <div class="character-wrap">
-      <div class="char-avatar" id="char-avatar"></div>
-      <div class="char-label" id="char-label"></div>
-    </div>
+<div id="experience">
+  <div class="scene-strip">
+    <div class="scene-dot"></div>
+    <div class="scene-name" id="scene-name"></div>
+    <div class="char-pill" id="char-pill"></div>
   </div>
 
-  <div class="dialogue-wrap">
+  <div class="char-area">
+    <div class="avatar-wrap" id="avatar-wrap"></div>
+    <div class="dialogue-col">
+      <div class="char-name-tag" id="char-name-tag"></div>
+      <div class="char-line" id="char-line">…</div>
+      <div class="subtitle" id="subtitle"></div>
+      <button class="sub-reveal" id="sub-reveal" onclick="revealSub()">¿qué significa?</button>
+    </div>
     <div class="speaking-dot" id="speaking-dot"></div>
-    <div class="char-line" id="char-line">…</div>
-    <div class="subtitle full" id="subtitle"></div>
-    <button class="subtitle-reveal" id="subtitle-reveal" onclick="revealSubtitle()">¿qué significa?</button>
-    <div class="nm-card" id="nm-card">
-      <div class="nm-label">Así se dice en inglés</div>
-      <div class="nm-phrase" id="nm-phrase"></div>
-      <div class="nm-actions">
-        <button class="nm-btn nm-btn-listen" onclick="listenNM()">🔊 Escuchar</button>
-        <button class="nm-btn nm-btn-listen" id="nm-repeat" onclick="repeatNM()" style="display:none">🎙 Repetir</button>
-        <button class="nm-btn nm-btn-skip" onclick="closeNM()">Continuar</button>
-      </div>
+  </div>
+
+  <div class="nm-card" id="nm-card">
+    <div class="nm-tag">Así se dice en inglés</div>
+    <div class="nm-phrase" id="nm-phrase"></div>
+    <div class="nm-actions">
+      <button class="nm-btn nm-listen" onclick="listenNM()">🔊 Escuchar</button>
+      <button class="nm-btn nm-listen" id="nm-rep" onclick="repeatNM()" style="display:none">🎙 Repetir</button>
+      <button class="nm-btn nm-skip" onclick="closeNM()">Continuar</button>
     </div>
   </div>
 
@@ -452,7 +575,7 @@
         </svg>
       </button>
       <textarea id="user-input" class="text-input" rows="1"
-        placeholder="Escribe en español o en inglés…"
+        id="user-input-placeholder" placeholder="Escribe en español o en inglés…"
         onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
       <button class="btn-send" id="send-btn" onclick="send()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -461,372 +584,323 @@
         </svg>
       </button>
     </div>
-    <div class="hint">Puedes escribir en español. La situación no se detiene.</div>
+    <div class="hint" id="lang-hint-exp"></div>
   </div>
 </div>
 
 <!-- ENDING -->
-<div id="ending-screen">
-  <div class="ending-icon">✓</div>
+<div id="ending">
+  <div class="ending-badge">✓</div>
   <div class="ending-title">Situación completada</div>
-  <div class="ending-msg" id="ending-msg"></div>
-  <div class="ending-actions">
-    <button class="btn-primary" onclick="copyConv()">📋 Copiar conversación</button>
-    <button class="btn-secondary" onclick="newSituation()">Nueva situación →</button>
+  <div class="ending-sub" id="ending-sub"></div>
+  <div class="ending-acts">
+    <button class="btn-new" onclick="newSit()">Nueva situación →</button>
+    <button class="btn-copy" onclick="copyConv()">📋 Copiar conversación</button>
   </div>
 </div>
 
 <script>
-const PROXY_URL = '/api/chat';
+const PROXY = '/api/chat';
 
-// ── STATE ─────────────────────────────────────────
-let situation = '';        // user's description
-let charName = '';         // set by AI on first response
-let charRole = '';
-let history = [];          // conversation history for API
-let exchanges = 0;
-let autoCont = 0;
-let nmPhrase = '';
-let isSpeaking = false;
-let voices = [];
-let recognition = null;
-let isRec = false;
-let spokenInES = 0;
-let spokenInEN = 0;
-let subtitleCache = '';     // subtitle for current line
+// ── LANGUAGE DETECTION ────────────────────────
+const userLang = (navigator.language || navigator.userLanguage || 'es').split('-')[0].toLowerCase();
+const langHints = {
+  es: ['Puedes escribir en español en cualquier momento.', 'Español o inglés — la situación no se detiene.'],
+  fr: ['Tu peux écrire en français à tout moment.', 'Français ou anglais — la situation continue.'],
+  pt: ['Podes escrever em português a qualquer momento.', 'Português ou inglês — a situação não para.'],
+  it: ['Puoi scrivere in italiano in qualsiasi momento.', 'Italiano o inglese — la situazione continua.'],
+  de: ['Du kannst jederzeit auf Deutsch schreiben.', 'Deutsch oder Englisch — die Situation läuft weiter.'],
+  nl: ['Je kunt op elk moment in het Nederlands schrijven.', 'Nederlands of Engels — de situatie gaat door.'],
+  pl: ['Możesz pisać po polsku w dowolnym momencie.', 'Polski lub angielski — sytuacja trwa.'],
+  ru: ['Вы можете писать по-русски в любое время.', 'Русский или английский — ситуация продолжается.'],
+  zh: ['您可以随时用中文书写。', '中文或英文 — 情景不会中断。'],
+  ja: ['いつでも日本語で書けます。', '日本語または英語 — 状況は続きます。'],
+  ar: ['يمكنك الكتابة بالعربية في أي وقت.', 'عربي أو إنجليزي — الموقف لا يتوقف.'],
+  tr: ['İstediğin zaman Türkçe yazabilirsin.', 'Türkçe veya İngilizce — durum devam eder.'],
+};
+const hints = langHints[userLang] || langHints['es'];
+document.addEventListener('DOMContentLoaded', () => {
+  const s = document.getElementById('lang-hint-setup');
+  const e = document.getElementById('lang-hint-exp');
+  if (s) s.textContent = hints[0];
+  if (e) e.textContent = hints[1];
+});
+let situation = '', charName = '', charRole = '';
+let hist = [], exchanges = 0, autoCont = 0, nmPhrase = '';
+let isSpeaking = false, voices = [], recognition = null, isRec = false;
+let esCount = 0, enCount = 0, subCache = '';
 
-// ── AVATAR ────────────────────────────────────────
+// ── EXAMPLES ─────────────────────────────────
+function setExample(btn) {
+  const map = {
+    '☕ Cafetería en Londres': 'Estoy en una cafetería en Londres y quiero pedir un café y algo de desayuno.',
+    '🏨 Hotel en Nueva York': 'Acabo de llegar a un hotel en Nueva York y necesito hacer el check-in.',
+    '🚕 Taxi en Bangkok': 'Estoy en Bangkok y quiero coger un taxi al aeropuerto.',
+    '🛒 Tienda en Berlín': 'Estoy en una tienda de ropa en Berlín y quiero comprar una chaqueta.',
+    '✈️ Aeropuerto en Dubai': 'Estoy en el aeropuerto de Dubai y no encuentro mi puerta de embarque.'
+  };
+  document.getElementById('sit-input').value = map[btn.textContent] || btn.textContent;
+}
+
+// ── AVATAR ────────────────────────────────────
 function makeAvatar(role) {
-  // Neutral professional avatar, adapts color by role type
-  const isWarm = /barista|waiter|cafe|shop|store|market/.test(role);
-  const top = isWarm ? '#5c3d2e' : '#1a3a5c';
-  const skin = '#e8c9a0';
-  return `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg">
-    <rect x="20" y="55" width="50" height="35" rx="8" fill="${top}"/>
-    <rect x="38" y="46" width="14" height="12" rx="4" fill="${skin}"/>
-    <ellipse cx="45" cy="36" rx="18" ry="20" fill="${skin}"/>
-    <ellipse cx="45" cy="19" rx="16" ry="10" fill="#3d2b1f"/>
-    <ellipse cx="45" cy="22" rx="18" ry="8" fill="#3d2b1f"/>
-    <ellipse cx="38" cy="34" rx="3" ry="3.5" fill="white"/>
-    <ellipse cx="52" cy="34" rx="3" ry="3.5" fill="white"/>
-    <circle cx="38.5" cy="34.5" r="2" fill="#3d2b1f"/>
-    <circle cx="52.5" cy="34.5" r="2" fill="#3d2b1f"/>
-    <path d="M39 42 Q45 47 51 42" stroke="#c0846a" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  const warm = /barista|waiter|cafe|shop|store|market|taxi|driver/.test((role||'').toLowerCase());
+  const bg = warm ? '#00E676' : '#111111';
+  return `<svg viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="26" cy="26" r="26" fill="${bg}"/>
+    <ellipse cx="26" cy="22" rx="10" ry="11" fill="#f5dfc0"/>
+    <ellipse cx="26" cy="12" rx="9.5" ry="6" fill="#2d1a0e"/>
+    <rect x="20" y="30" width="12" height="7" rx="2" fill="#f5dfc0"/>
+    <rect x="12" y="34" width="28" height="18" rx="6" fill="${warm ? '#fff' : '#1a3a5c'}"/>
+    <ellipse cx="20" cy="21" rx="1.8" ry="2" fill="#1a1a1a"/>
+    <ellipse cx="32" cy="21" rx="1.8" ry="2" fill="#1a1a1a"/>
+    <path d="M22 27 Q26 30 30 27" stroke="#c0846a" stroke-width="1.2" fill="none" stroke-linecap="round"/>
   </svg>`;
 }
 
-// ── SYSTEM PROMPT ─────────────────────────────────
+// ── PROMPT ────────────────────────────────────
 function buildPrompt() {
-  const subtitleLevel = getSubtitleLevel();
-  return `You are a local character in this situation: "${situation}"
+  return `You are a character in this situation: "${situation}"
 
-Choose the most fitting name and role for this scene and stay in character throughout. Be realistic and natural — act exactly as a real person in that role would.
+Pick the most fitting name and role. Stay in character throughout as a real person would.
 
-The user is a Spanish speaker learning English. They may respond in Spanish or broken English at any time. Always understand their intention and continue the scene. Never say you do not understand. Never break character.
+The user's native language may not be Spanish or English — they could be a speaker of any language. Always provide subtitle_es in their native language if possible, but Spanish as fallback. The user may write in any language — always understand and continue. Always understand their intention and continue — never say you don't understand, never break character.
 
-If the user says something grammatically imperfect, reflect the correct English naturally in your reply without ever correcting them explicitly.
+If the user says something grammatically imperfect, naturally reflect the correct form in your reply without explicitly correcting them.
 
-Be brief. One short sentence per turn. No filler like "let me check" or "one moment" — act directly. When delivering something (food, drink, key, ticket), always add a natural follow-up question in the same sentence (e.g. "Here you go — anything else?", "There's your key — do you need help with your bags?").
+One short sentence per turn. When delivering something (food, drink, key, change), add a brief natural follow-up question in the same line.
 
-When the situation reaches a natural end (the user has achieved their goal), set situation_ended to true.
+When the user has achieved their goal, set situation_ended to true.
 
-Respond ONLY with this JSON (no markdown, no extra text):
-{"line":"your English reply","subtitle_es":"Spanish translation","char_name":"character name","char_role":"character role","natural_model":"natural English of what user tried to say, or empty string","expects_user_input":true,"situation_ended":false}`;
+Reply ONLY with this JSON:
+{"line":"English reply","subtitle_es":"translation of your English reply into the user's language (Spanish if unknown)","char_name":"name","char_role":"role","natural_model":"natural English of what user tried to say or empty string","expects_user_input":true,"situation_ended":false,"mood":"one of: hotel, cafe, fashion, airport, bar, market, taxi, beach, default"}`;
 }
 
-// ── AI CALL ───────────────────────────────────────
+// ── AI ────────────────────────────────────────
 async function callAI(userMsg) {
-  const msgs = [...history];
+  const msgs = [...hist];
   if (userMsg) msgs.push({ role: 'user', content: userMsg });
-
-  const res = await fetch(PROXY_URL, {
+  const res = await fetch(PROXY, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      system: buildPrompt(),
-      messages: msgs,
-      temperature: 0.7,
-      max_tokens: 350
-    })
+    body: JSON.stringify({ system: buildPrompt(), messages: msgs, temperature: 0.7, max_tokens: 300 })
   });
-
-  if (!res.ok) {
-    const e = await res.json();
-    throw new Error(e.error?.message || 'Error ' + res.status);
-  }
-
+  if (!res.ok) { const e = await res.json(); throw new Error(e.error?.message || 'Error'); }
   const data = await res.json();
   const raw = data.content[0].text;
-  const match = raw.match(/\{[\s\S]*\}/);
-  if (!match) throw new Error('No JSON in response');
-
-  const parsed = JSON.parse(match[0]);
-  parsed.situation_ended  = parsed.situation_ended  === true || parsed.situation_ended  === 'true';
-  parsed.expects_user_input = parsed.expects_user_input !== false && parsed.expects_user_input !== 'false';
-  parsed.natural_model    = parsed.natural_model || '';
-  parsed.subtitle_es      = parsed.subtitle_es || '';
-  return parsed;
+  const m = raw.match(/\{[\s\S]*\}/);
+  if (!m) throw new Error('No JSON in response');
+  const p = JSON.parse(m[0]);
+  p.situation_ended    = p.situation_ended    === true || p.situation_ended    === 'true';
+  p.expects_user_input = p.expects_user_input !== false && p.expects_user_input !== 'false';
+  p.natural_model      = p.natural_model || '';
+  p.subtitle_es        = p.subtitle_es || '';
+  return p;
 }
 
-// ── START ─────────────────────────────────────────
+// ── START ─────────────────────────────────────
 async function startExperience() {
-  situation = document.getElementById('situation-input').value.trim();
-  if (!situation) { alert('Describe tu situación para empezar.'); return; }
-
-  document.getElementById('setup-screen').style.display = 'none';
-  document.getElementById('experience-screen').style.display = 'flex';
-  document.getElementById('scene-location').textContent = situation.slice(0, 45) + (situation.length > 45 ? '…' : '');
-
-  initSTT();
-  loadVoices();
-  showThinking(true);
-
+  situation = document.getElementById('sit-input').value.trim();
+  if (!situation) { alert('Describe tu situación primero.'); return; }
+  document.getElementById('setup').style.display = 'none';
+  document.getElementById('experience').style.display = 'flex';
+  document.getElementById('experience').classList.add('mood-default');
+  document.getElementById('scene-name').textContent = situation.slice(0, 50) + (situation.length > 50 ? '…' : '');
+  document.getElementById('user-input').placeholder = getInputPlaceholder();
+  initSTT(); loadVoices(); showThinking(true);
   try {
-    const ai = await callAI('(open the scene — greet the user as the appropriate character for this situation)');
+    const ai = await callAI('(open the scene — greet the user as the fitting character for this situation)');
     showThinking(false);
-    applyCharacter(ai);
+    applyChar(ai);
     showLine(ai.line, ai.subtitle_es);
-    addToHistory('char', ai.line, ai.subtitle_es);
-    history.push({ role: 'assistant', content: ai.line });
-    handleContinuation(ai);
-  } catch(e) {
-    showThinking(false);
-    showError(e.message);
-  }
+    addMsg('char', ai.line, ai.subtitle_es);
+    hist.push({ role: 'assistant', content: ai.line });
+    handleCont(ai);
+  } catch(e) { showThinking(false); showErr(e.message); }
 }
 
-// ── SEND ──────────────────────────────────────────
+// ── SEND ──────────────────────────────────────
 async function send() {
-  const input = document.getElementById('user-input');
-  const text = input.value.trim();
-  if (!text || isSpeaking) return;
-
-  input.value = '';
-  autoResize(input);
+  const inp = document.getElementById('user-input');
+  const text = inp.value.trim();
+  if (!text) return;
+  inp.value = ''; autoResize(inp);
   document.getElementById('send-btn').disabled = true;
-  closeNM();
-  autoCont = 0;
-
-  const lang = detectLang(text);
-  if (lang === 'es') spokenInES++; else spokenInEN++;
-  exchanges++;
-
-  addToHistory('user', text);
-  history.push({ role: 'user', content: text });
-
+  closeNM(); autoCont = 0; exchanges++;
+  detectLang(text) === 'es' ? esCount++ : enCount++;
+  addMsg('user', text);
+  hist.push({ role: 'user', content: text });
   showThinking(true);
   try {
     const ai = await callAI(null);
     showThinking(false);
-    applyCharacter(ai);
+    applyChar(ai);
     showLine(ai.line, ai.subtitle_es);
-    addToHistory('char', ai.line, ai.subtitle_es);
-    history.push({ role: 'assistant', content: ai.line });
+    addMsg('char', ai.line, ai.subtitle_es);
+    hist.push({ role: 'assistant', content: ai.line });
     if (ai.natural_model) showNM(ai.natural_model);
-    handleContinuation(ai);
-  } catch(e) {
-    showThinking(false);
-    showError(e.message);
-  }
-
+    handleCont(ai);
+  } catch(e) { showThinking(false); showErr(e.message); }
   document.getElementById('send-btn').disabled = false;
 }
 
-// ── CONTINUATION ──────────────────────────────────
-function handleContinuation(ai) {
-  if (ai.situation_ended) { setTimeout(showEnding, 4500); return; }
+// ── CONTINUATION ──────────────────────────────
+function handleCont(ai) {
+  if (ai.situation_ended) { setTimeout(showEnding, 4000); return; }
   if (!ai.expects_user_input && autoCont < 1) {
     autoCont++;
-    setTimeout(autoContinue, 1400);
+    setTimeout(autoContinue, 1300);
   } else if (!ai.expects_user_input) {
-    showContinueBtn();
+    showContBtn();
   }
 }
 
 async function autoContinue() {
   showThinking(true);
-  history.push({ role: 'user', content: '(continue — advance the situation)' });
+  hist.push({ role: 'user', content: '(continue — advance the situation naturally)' });
   try {
     const ai = await callAI(null);
     showThinking(false);
     showLine(ai.line, ai.subtitle_es);
-    addToHistory('char', ai.line, ai.subtitle_es);
-    history.push({ role: 'assistant', content: ai.line });
+    addMsg('char', ai.line, ai.subtitle_es);
+    hist.push({ role: 'assistant', content: ai.line });
     if (ai.natural_model) showNM(ai.natural_model);
-    handleContinuation(ai);
-  } catch(e) {
-    showThinking(false);
-    showError(e.message);
-  }
+    handleCont(ai);
+  } catch(e) { showThinking(false); showErr(e.message); }
 }
 
-function showContinueBtn() {
+function showContBtn() {
   if (document.getElementById('cont-btn')) return;
   const btn = document.createElement('button');
-  btn.id = 'cont-btn';
-  btn.textContent = 'Continuar →';
-  btn.style.cssText = 'align-self:center;padding:0.45rem 1.1rem;background:var(--gold);color:var(--night);border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:0.82rem;margin:0.3rem auto;';
+  btn.id = 'cont-btn'; btn.className = 'cont-btn'; btn.textContent = 'Continuar →';
   btn.onclick = () => { btn.remove(); autoContinue(); };
-  const hist = document.getElementById('history');
-  hist.insertBefore(btn, document.getElementById('thinking'));
-  hist.scrollTop = hist.scrollHeight;
+  const h = document.getElementById('history');
+  h.insertBefore(btn, document.getElementById('thinking'));
+  h.scrollTop = h.scrollHeight;
 }
 
-// ── CHARACTER ─────────────────────────────────────
-function applyCharacter(ai) {
+// ── CHARACTER ─────────────────────────────────
+function applyChar(ai) {
   if (ai.char_name && ai.char_name !== charName) {
-    charName = ai.char_name;
-    charRole = ai.char_role || '';
-    document.getElementById('char-label').textContent = charName + (charRole ? ' · ' + charRole : '');
-    document.getElementById('char-avatar').innerHTML = makeAvatar(charRole);
+    charName = ai.char_name; charRole = ai.char_role || '';
+    document.getElementById('char-name-tag').textContent = charName + (charRole ? ' · ' + charRole : '');
+    document.getElementById('char-pill').textContent = charName;
+    document.getElementById('avatar-wrap').innerHTML = makeAvatar(charRole);
   }
+  if (ai.mood) applyMood(ai.mood);
 }
 
-// ── DIALOGUE ──────────────────────────────────────
-function showLine(line, subtitle) {
-  subtitleCache = subtitle;
+function applyMood(mood) {
+  const strip = document.getElementById('experience');
+  const moods = ['hotel','cafe','fashion','airport','bar','market','taxi','beach','default'];
+  moods.forEach(m => strip.classList.remove('mood-' + m));
+  strip.classList.add('mood-' + (moods.includes(mood) ? mood : 'default'));
+}
+
+// ── DIALOGUE ──────────────────────────────────
+function showLine(line, sub) {
+  subCache = sub;
   const el = document.getElementById('char-line');
   el.textContent = line;
-  el.classList.remove('pop');
-  void el.offsetWidth;
-  el.classList.add('pop');
-
-  const level = getSubtitleLevel();
+  el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop');
+  const level = exchanges < 5 ? 'full' : exchanges < 10 ? 'soft' : 'demand';
   const subEl = document.getElementById('subtitle');
-  const revBtn = document.getElementById('subtitle-reveal');
-
-  if (level === 'full' && subtitle) {
-    subEl.textContent = subtitle;
-    subEl.className = 'subtitle full';
-    revBtn.style.display = 'none';
-  } else if (level === 'soft' && subtitle) {
-    subEl.textContent = subtitle;
-    subEl.className = 'subtitle soft';
-    revBtn.style.display = 'none';
+  const revBtn = document.getElementById('sub-reveal');
+  if (level === 'full' && sub) {
+    subEl.textContent = sub; subEl.className = 'subtitle'; revBtn.style.display = 'none';
+  } else if (level === 'soft' && sub) {
+    subEl.textContent = sub; subEl.className = 'subtitle soft'; revBtn.style.display = 'none';
   } else {
-    subEl.textContent = '';
-    subEl.className = 'subtitle hidden';
-    revBtn.style.display = subtitle ? 'block' : 'none';
-    revBtn.textContent = '¿qué significa?';
+    subEl.textContent = ''; subEl.className = 'subtitle hidden';
+    revBtn.style.display = sub ? 'block' : 'none'; revBtn.textContent = '¿qué significa?';
   }
-
   waitForVoices(line);
 }
 
-function getSubtitleLevel() {
-  if (exchanges < 5) return 'full';
-  if (exchanges < 10) return 'soft';
-  return 'demand';
-}
-
-function revealSubtitle() {
-  const subEl = document.getElementById('subtitle');
-  const btn = document.getElementById('subtitle-reveal');
-  if (subEl.classList.contains('hidden')) {
-    subEl.textContent = subtitleCache;
-    subEl.className = 'subtitle soft';
-    btn.textContent = 'ocultar';
+function revealSub() {
+  const s = document.getElementById('subtitle');
+  const b = document.getElementById('sub-reveal');
+  if (s.classList.contains('hidden')) {
+    s.textContent = subCache; s.className = 'subtitle soft'; b.textContent = 'ocultar';
   } else {
-    subEl.className = 'subtitle hidden';
-    btn.textContent = '¿qué significa?';
+    s.className = 'subtitle hidden'; b.textContent = '¿qué significa?';
   }
 }
 
-// ── NATURAL MODEL ─────────────────────────────────
+// ── NM ────────────────────────────────────────
 function showNM(phrase) {
   nmPhrase = phrase;
   document.getElementById('nm-phrase').textContent = '\u201c' + phrase + '\u201d';
   document.getElementById('nm-card').classList.add('on');
-  document.getElementById('nm-repeat').style.display = recognition ? 'inline-block' : 'none';
-  // Also add subtle card to history
-  const hist = document.getElementById('history');
-  const thinking = document.getElementById('thinking');
+  document.getElementById('nm-rep').style.display = recognition ? 'inline-block' : 'none';
+  const h = document.getElementById('history');
+  const t = document.getElementById('thinking');
   const card = document.createElement('div');
-  card.className = 'nm-history';
-  card.innerHTML = '<span class="nm-history-label">As\u00ed se dice</span><span class="nm-history-phrase">\u201c' + phrase + '\u201d</span>';
-  hist.insertBefore(card, thinking);
-  hist.scrollTop = hist.scrollHeight;
+  card.className = 'nm-hist';
+  card.innerHTML = '<span class="nm-hist-tag">As\u00ed se dice</span><span class="nm-hist-phrase">\u201c' + phrase + '\u201d</span>';
+  h.insertBefore(card, t);
+  h.scrollTop = h.scrollHeight;
 }
-
 function closeNM() { document.getElementById('nm-card').classList.remove('on'); }
 function listenNM() { if (nmPhrase) speakAt(nmPhrase, 0.65); }
 function repeatNM() { if (recognition) startRec(); }
 
-// ── HISTORY ───────────────────────────────────────
-function addToHistory(role, text, subtitle) {
-  const hist = document.getElementById('history');
-  const thinking = document.getElementById('thinking');
-  const msg = document.createElement('div');
-  msg.className = 'msg msg-' + (role === 'char' ? 'char' : 'user');
-  if (role === 'char' && subtitle) {
-    msg.innerHTML = '<span class="msg-en">' + esc(text) + '</span><span class="msg-sub">' + esc(subtitle) + '</span>';
-  } else {
-    msg.textContent = text;
-  }
-  hist.insertBefore(msg, thinking);
-  hist.scrollTop = hist.scrollHeight;
+// ── HISTORY ───────────────────────────────────
+function addMsg(role, text, sub) {
+  const h = document.getElementById('history');
+  const t = document.getElementById('thinking');
+  const m = document.createElement('div');
+  m.className = 'msg msg-' + (role === 'char' ? 'char' : role === 'user' ? 'user' : 'system');
+  if (role === 'char' && sub) {
+    m.innerHTML = '<span class="msg-en">' + esc(text) + '</span><span class="msg-sub">' + esc(sub) + '</span>';
+  } else { m.textContent = text; }
+  h.insertBefore(m, t);
+  h.scrollTop = h.scrollHeight;
 }
-
 function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
 function showThinking(on) {
   document.getElementById('thinking').classList.toggle('on', on);
   document.getElementById('history').scrollTop = 99999;
 }
+function showErr(msg) { addMsg('system', '⚠️ ' + msg); }
 
-function showError(msg) {
-  const hist = document.getElementById('history');
-  const e = document.createElement('div');
-  e.className = 'msg msg-system';
-  e.textContent = '⚠️ ' + msg;
-  hist.insertBefore(e, document.getElementById('thinking'));
-  hist.scrollTop = 99999;
-}
-
-// ── ENDING ────────────────────────────────────────
+// ── ENDING ────────────────────────────────────
 function showEnding() {
-  document.getElementById('ending-msg').textContent =
-    'Has completado la situación. Intercambios en inglés: ' + spokenInEN + ' de ' + exchanges + '.';
-  document.getElementById('ending-screen').style.display = 'flex';
+  document.getElementById('ending-sub').textContent =
+    'Completaste la situación con ' + exchanges + ' intercambios — ' + enCount + ' en inglés.';
+  document.getElementById('ending').style.display = 'flex';
 }
-
-function newSituation() {
-  document.getElementById('ending-screen').style.display = 'none';
-  // Reset state
-  history = []; exchanges = 0; autoCont = 0; spokenInES = 0; spokenInEN = 0;
-  charName = ''; charRole = ''; nmPhrase = ''; subtitleCache = '';
-  document.getElementById('history').querySelectorAll('.msg,.nm-history,#cont-btn').forEach(e => e.remove());
+function newSit() {
+  hist = []; exchanges = 0; autoCont = 0; esCount = 0; enCount = 0;
+  charName = ''; charRole = ''; nmPhrase = ''; subCache = '';
+  document.getElementById('ending').style.display = 'none';
+  document.getElementById('history').querySelectorAll('.msg,.nm-hist,.cont-btn').forEach(e => e.remove());
   document.getElementById('char-line').textContent = '…';
   document.getElementById('subtitle').textContent = '';
   document.getElementById('nm-card').classList.remove('on');
-  document.getElementById('setup-screen').style.display = 'flex';
-  document.getElementById('experience-screen').style.display = 'none';
+  document.getElementById('char-name-tag').textContent = '';
+  document.getElementById('char-pill').textContent = '';
+  document.getElementById('scene-name').textContent = '';
+  document.getElementById('sit-input').value = '';
+  document.getElementById('setup').style.display = 'flex';
+  document.getElementById('experience').style.display = 'none';
 }
-
 function copyConv() {
-  const msgs = document.querySelectorAll('.msg-char, .msg-user');
-  let txt = 'Live It — conversación\n\n';
+  const msgs = document.querySelectorAll('.msg-char,.msg-user');
+  let txt = 'Live It\n\n';
   msgs.forEach(m => {
     const isChar = m.classList.contains('msg-char');
     const en = m.querySelector('.msg-en');
-    const sub = m.querySelector('.msg-sub');
-    if (en) {
-      txt += (isChar ? (charName||'Personaje') : 'Tú') + ': ' + en.textContent + '\n';
-      if (sub) txt += '   ' + sub.textContent + '\n';
-    } else {
-      txt += (isChar ? (charName||'Personaje') : 'Tú') + ': ' + m.textContent + '\n';
-    }
-    txt += '\n';
+    txt += (isChar ? (charName||'—') : 'Tú') + ': ' + (en ? en.textContent : m.textContent) + '\n\n';
   });
-  navigator.clipboard.writeText(txt).then(() => alert('Copiado.')).catch(() => alert('No se pudo copiar.'));
+  navigator.clipboard.writeText(txt).then(() => alert('Copiado.')).catch(() => alert('Selecciona el texto manualmente.'));
 }
 
-// ── TTS ───────────────────────────────────────────
+// ── TTS ───────────────────────────────────────
 function loadVoices() {
   voices = window.speechSynthesis.getVoices();
   if (!voices.length) window.speechSynthesis.onvoiceschanged = () => { voices = window.speechSynthesis.getVoices(); };
 }
-
 function waitForVoices(text) {
   if (voices.length) { speak(text); return; }
   let n = 0;
@@ -835,66 +909,71 @@ function waitForVoices(text) {
     if (voices.length || ++n > 20) { clearInterval(t); speak(text); }
   }, 100);
 }
-
 function speak(text) {
   if (!window.speechSynthesis) return;
   window.speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
-  u.lang = 'en-US';
-  u.rate = 0.72;
-  u.pitch = 1.0;
-  const v = voices.find(v => v.lang === 'en-US' && /female|woman/i.test(v.name))
-         || voices.find(v => v.lang === 'en-US')
-         || voices.find(v => v.lang.startsWith('en'));
+  u.lang = 'en-US'; u.rate = 0.72; u.pitch = 1.0;
+  const v = voices.find(v => v.lang === 'en-US') || voices.find(v => v.lang.startsWith('en'));
   if (v) u.voice = v;
   u.onstart = () => { isSpeaking = true; document.getElementById('speaking-dot').classList.add('on'); };
   u.onend   = () => { isSpeaking = false; document.getElementById('speaking-dot').classList.remove('on'); };
   window.speechSynthesis.speak(u);
 }
-
 function speakAt(text, rate) {
   if (!window.speechSynthesis) return;
   window.speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
-  u.lang = 'en-US'; u.rate = rate || 0.65; u.pitch = 1.0;
+  u.lang = 'en-US'; u.rate = rate || 0.65;
   const v = voices.find(v => v.lang === 'en-US') || voices.find(v => v.lang.startsWith('en'));
   if (v) u.voice = v;
   window.speechSynthesis.speak(u);
 }
 
-// ── STT ───────────────────────────────────────────
+// ── STT ───────────────────────────────────────
+function getInputPlaceholder() {
+  const placeholders = {
+    es: 'Escribe en español o en inglés…',
+    fr: 'Écris en français ou en anglais…',
+    pt: 'Escreve em português ou inglês…',
+    it: 'Scrivi in italiano o in inglese…',
+    de: 'Schreib auf Deutsch oder Englisch…',
+    nl: 'Schrijf in het Nederlands of Engels…',
+    pl: 'Pisz po polsku lub angielsku…',
+    ru: 'Пишите по-русски или по-английски…',
+    zh: '用中文或英文输入…',
+    ja: '日本語または英語で入力…',
+    ar: 'اكتب بالعربية أو الإنجليزية…',
+    tr: 'Türkçe veya İngilizce yaz…',
+  };
+  return placeholders[userLang] || placeholders['es'];
+}
+
 function initSTT() {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SR) { document.getElementById('mic-btn').style.display = 'none'; return; }
   recognition = new SR();
   recognition.interimResults = false;
-  recognition.maxAlternatives = 1;
   recognition.onresult = e => {
     document.getElementById('user-input').value = e.results[0][0].transcript;
-    stopRec();
-    setTimeout(send, 300);
+    stopRec(); setTimeout(send, 300);
   };
   recognition.onerror = recognition.onend = () => stopRec();
 }
-
 function toggleMic() { isRec ? stopRec() : startRec(); }
-
 function startRec() {
   if (!recognition) return;
-  recognition.lang = spokenInEN > spokenInES && spokenInEN > 2 ? 'en-US' : 'es-ES';
-  recognition.start();
+  recognition.lang = enCount > esCount && enCount > 2 ? 'en-US' : 'es-ES';
+  try { recognition.start(); } catch(e) {}
   isRec = true;
-  const btn = document.getElementById('mic-btn');
-  btn.classList.add('rec');
-  btn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="9" y="9" width="6" height="6" rx="1"/></svg>';
+  const b = document.getElementById('mic-btn'); b.classList.add('rec');
+  b.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="9" y="9" width="6" height="6" rx="1"/></svg>';
 }
-
 function stopRec() {
   if (recognition) try { recognition.stop(); } catch(e) {}
   isRec = false;
-  const btn = document.getElementById('mic-btn');
-  btn.classList.remove('rec');
-  btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+  const b = document.getElementById('mic-btn'); b.classList.remove('rec');
+  b.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
     <path d="M12 1a4 4 0 0 1 4 4v6a4 4 0 0 1-8 0V5a4 4 0 0 1 4-4z"/>
     <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
     <line x1="12" y1="19" x2="12" y2="23"/>
@@ -902,19 +981,12 @@ function stopRec() {
   </svg>`;
 }
 
-// ── UTILS ─────────────────────────────────────────
+// ── UTILS ─────────────────────────────────────
 function detectLang(t) {
-  return /\b(el|la|los|las|un|una|que|de|en|con|por|para|tengo|quiero|necesito|es|son|hay|soy|pero|como|dónde|qué|cómo|sí|no|gracias|hola|buenos|buenas)\b/i.test(t) ? 'es' : 'en';
+  return /\b(el|la|los|las|un|una|que|de|en|con|por|para|tengo|quiero|necesito|es|son|hay|soy|pero|como|dónde|qué|cómo|sí|no|gracias|hola|buenos|buenas|quería|quisiera)\b/i.test(t) ? 'es' : 'en';
 }
-
-function handleKey(e) {
-  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
-}
-
-function autoResize(el) {
-  el.style.height = 'auto';
-  el.style.height = Math.min(el.scrollHeight, 100) + 'px';
-}
+function handleKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }
+function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 100) + 'px'; }
 </script>
 </body>
 </html>
