@@ -900,11 +900,11 @@ Rules:
 - Never correct explicitly
 - Maximum 2 short sentences
 - Fill all response fields:
-  * line: your English reply
-  * subtitle_es: Spanish translation of your reply
-  * natural_model: the correct English version of what the user tried to say, or empty string if not applicable
-  * beat_completed: true if this task is now done, false otherwise
-  * situation_ended: true only when saying farewell at the very end`;
+  * line: your English reply (string)
+  * subtitle_es: Spanish translation of your reply (string)
+  * natural_model: corrected English of what user tried to say, or empty string "" if not needed (string)
+  * beat_completed: JSON boolean true when this task completes, JSON boolean false otherwise
+  * situation_ended: JSON boolean true only on farewell, JSON boolean false otherwise`;
 }
 
 // ─── LLAMADA A IA (vía proxy) ─────────────────────
@@ -925,25 +925,7 @@ async function callGroq(userMessage) {
       ],
       temperature: 0.6,
       max_tokens: 400,
-      response_format: {
-        type: "json_schema",
-        json_schema: {
-          name: "english_situation",
-          strict: true,
-          schema: {
-            type: "object",
-            properties: {
-              line:            { type: "string" },
-              subtitle_es:     { type: "string" },
-              natural_model:   { type: "string" },
-              beat_completed:  { type: "boolean" },
-              situation_ended: { type: "boolean" }
-            },
-            required: ["line","subtitle_es","natural_model","beat_completed","situation_ended"],
-            additionalProperties: false
-          }
-        }
-      },
+      response_format: { type: "json_object" },
     })
   });
 
@@ -954,10 +936,15 @@ async function callGroq(userMessage) {
 
   const data = await response.json();
   const raw = data.choices[0].message.content;
-  // Extract JSON even if model wraps it in markdown
   const match = raw.match(/\{[\s\S]*\}/);
   if (!match) throw new Error('No JSON in response');
-  return JSON.parse(match[0]);
+  const parsed = JSON.parse(match[0]);
+  // Coerce booleans in case model returns strings
+  parsed.beat_completed  = parsed.beat_completed  === true || parsed.beat_completed  === 'true';
+  parsed.situation_ended = parsed.situation_ended === true || parsed.situation_ended === 'true';
+  parsed.natural_model   = parsed.natural_model || '';
+  parsed.subtitle_es     = parsed.subtitle_es || '';
+  return parsed;
 }
 
 // ─── ENVIAR MENSAJE ───────────────────────────────
