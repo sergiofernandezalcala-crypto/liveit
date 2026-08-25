@@ -634,10 +634,13 @@
   <div class="setup-tagline">No quieres estudiarlo. Quieres vivirlo.</div>
 
   <div class="setup-card">
-    <h2>Primera situación</h2>
-    <p>Acabas de llegar a Londres. Tienes que registrarte en tu hotel.<br>Puedes hablar o escribir en español. La situación no se detiene.</p>
-    <button class="btn-primary" id="start-btn" onclick="startExperience()">
-      Entrar al hotel →
+    <h2>Elige tu situación</h2>
+    <p>Puedes escribir en español en cualquier momento. La situación no se detiene.</p>
+    <button class="btn-primary" id="start-btn" onclick="startExperience('hotel')" style="margin-bottom:0.6rem">
+      🏨 Llegar al hotel
+    </button>
+    <button class="btn-primary" onclick="startExperience('cafe')" style="background:var(--surface);color:var(--cream);border:1px solid var(--border)">
+      ☕ Cafetería (mañana siguiente)
     </button>
   </div>
 
@@ -734,8 +737,8 @@
   <button class="btn-primary" style="max-width:280px;margin-bottom:0.8rem" onclick="copyConversation()">
     📋 Copiar conversación
   </button>
-  <button class="btn-primary" style="max-width:280px;background:var(--surface);color:var(--cream);border:1px solid var(--border)" onclick="location.reload()">
-    Vivir otra situación →
+  <button class="btn-primary" style="max-width:280px;background:var(--surface);color:var(--cream);border:1px solid var(--border)" onclick="nextSituation()">
+    Siguiente situación →
   </button>
 </div>
 
@@ -745,7 +748,7 @@
 ═══════════════════════════════════════════════════ -->
 <script>
 // ─── INLINE: SITUACIÓN ────────────────────────────
-const SITUATION = {
+const SITUATION_HOTEL = {
   id: "hotel-checkin",
   scene: {
     title: "Stanford Hotel · London",
@@ -795,10 +798,62 @@ const SITUATION = {
   }
 };
 
+
+// ─── SITUACIÓN 2: CAFETERÍA ────────────────────────
+const SITUATION_CAFE = {
+  id: "cafe-breakfast",
+  scene: {
+    title: "The Morning Cup · London",
+    background: "linear-gradient(160deg, #1a120b 0%, #2c1810 50%, #3d2314 100%)",
+    ambience: "La mañana siguiente. Una cafetería tranquila cerca del hotel. Huele a café recién hecho.",
+    timeOfDay: "morning"
+  },
+  character: {
+    name: "James",
+    role: "barista",
+    greeting: "James — Barista",
+    voice: "en-US",
+    voiceRate: 0.72,
+    voicePitch: 0.95,
+    personality: "Joven, amable y relajado. Entiende siempre la intención aunque el inglés sea imperfecto."
+  },
+  user: {
+    goal: "Pedir un café y algo de desayuno.",
+    startingLanguage: "es"
+  },
+  coreExpressions: [
+    { id: "what-can-i-get", en: "What can I get you?", es: "¿Qué te pongo?", priority: 1 },
+    { id: "anything-else", en: "Anything else?", es: "¿Algo más?", priority: 2 },
+    { id: "have-in-takeaway", en: "Is that to have in or take away?", es: "¿Para tomar aquí o para llevar?", priority: 2 },
+    { id: "how-long-staying", en: "How long are you staying in London?", es: "¿Cuánto tiempo te quedas en Londres?", priority: 3 },
+    { id: "that-comes-to", en: "That comes to four fifty.", es: "Son cuatro con cincuenta.", priority: 3 },
+    { id: "enjoy", en: "Enjoy!", es: "¡Que aproveche!", priority: 4 }
+  ],
+  beats: [
+    { id: "saludo",      desc: "James greets the customer casually", done: false },
+    { id: "tomar_nota",  desc: "James asks what they want", done: false },
+    { id: "aqui_llevar", desc: "James asks if it is to have in or take away", done: false },
+    { id: "charla",      desc: "James makes small talk — asks how long they are staying in London", done: false },
+    { id: "cobrar",      desc: "James gives the total price", done: false },
+    { id: "despedida",   desc: "James says enjoy and goodbye. Set situation_ended: true", done: false }
+  ],
+  opening: {
+    line: "Morning! What can I get you?",
+    subtitle: "¡Buenos días! ¿Qué te pongo?"
+  },
+  ending: {
+    message: "Has pedido tu café y has chateado un poco con James.",
+    bridge: "Ya llevas dos conversaciones en inglés. ¿Lo has notado?"
+  },
+  // Subtítulos reducidos desde el inicio — el usuario ya tiene base del hotel
+  subtitleStartLevel: 'soft'
+};
+
 // ─── ESTADO GLOBAL ────────────────────────────────
 // La API key vive en el servidor (variable de entorno GROQ_API_KEY en Vercel).
 // El frontend llama al proxy /api/chat — nunca a Groq directamente.
 const PROXY_URL = '/api/chat';
+let SITUATION = null;
 let conversationHistory = [];
 let sessionMemory = {
   expressionsSeen: {},
@@ -854,9 +909,21 @@ function buildPillars() {
 }
 
 // ─── INICIO ───────────────────────────────────────
-function startExperience() {
+function startExperience(situationId) {
+  // Select situation
+  if (situationId === 'cafe') {
+    SITUATION = JSON.parse(JSON.stringify(SITUATION_CAFE));
+  } else {
+    SITUATION = JSON.parse(JSON.stringify(SITUATION_HOTEL));
+  }
+
   document.getElementById('setup-screen').style.display = 'none';
   document.getElementById('experience-screen').style.display = 'flex';
+
+  // Update scene visuals
+  document.getElementById('scene-location').textContent = SITUATION.scene.title;
+  document.getElementById('char-label').textContent = SITUATION.character.greeting;
+  document.querySelector('.scene-header').style.background = SITUATION.scene.background;
 
   buildAvatar();
   buildPillars();
@@ -1365,6 +1432,22 @@ function showThinking(visible) {
 }
 
 // ─── PANTALLA FINAL ───────────────────────────────
+function nextSituation() {
+  const currentId = SITUATION ? SITUATION.id : 'hotel-checkin';
+  // Reset state
+  conversationHistory = [];
+  sessionMemory = { expressionsSeen:{}, expressionsUnderstood:{}, totalExchanges:0, userUsedSpanish:0, userUsedEnglish:0 };
+  currentBeatIndex = 0;
+  autoContinuations = 0;
+  document.getElementById('ending-screen').style.display = 'none';
+  document.getElementById('history-area').querySelectorAll('.msg, #continue-btn').forEach(e => e.remove());
+  document.getElementById('char-line').textContent = '…';
+  document.getElementById('subtitle-line').textContent = '';
+  // Go to next situation
+  const next = currentId === 'hotel-checkin' ? 'cafe' : 'hotel';
+  startExperience(next);
+}
+
 function copyConversation() {
   const msgs = document.querySelectorAll('.msg-char, .msg-user');
   let text = 'Conversación — Stanford Hotel\n\n';
