@@ -731,7 +731,10 @@
   <div class="ending-title">Check-in completado</div>
   <div class="ending-message" id="ending-message"></div>
   <div class="ending-stats" id="ending-stats"></div>
-  <button class="btn-primary" style="max-width:280px" onclick="location.reload()">
+  <button class="btn-primary" style="max-width:280px;margin-bottom:0.8rem" onclick="copyConversation()">
+    📋 Copiar conversación
+  </button>
+  <button class="btn-primary" style="max-width:280px;background:var(--surface);color:var(--cream);border:1px solid var(--border)" onclick="location.reload()">
     Vivir otra situación →
   </button>
 </div>
@@ -773,14 +776,14 @@ const SITUATION = {
     { id: "enjoy-stay", en: "Enjoy your stay!", es: "¡Que disfrutes tu estancia!", priority: 5 }
   ],
   beats: [
-    { id: "bienvenida",        desc: "Emma saluda al usuario que acaba de entrar al hotel",                  done: false },
-    { id: "verificar_reserva", desc: "Emma verifica si el usuario tiene reserva",                            done: false },
-    { id: "datos_personales",  desc: "Emma pide el nombre para encontrar la reserva",                        done: false },
-    { id: "confirmar_estancia",desc: "Emma confirma cuántas noches se queda",                                done: false },
-    { id: "info_habitacion",   desc: "Emma da información sobre la habitación asignada",                     done: false },
-    { id: "entrega_llave",     desc: "Emma entrega la tarjeta-llave",                                        done: false },
-    { id: "info_hotel",        desc: "Emma menciona el desayuno u otro servicio",                            done: false },
-    { id: "despedida",         desc: "Emma se despide deseando buena estancia. IMPORTANTE: pon situation_ended: true", done: false }
+    { id: "bienvenida",        desc: "Emma greets the user who has just arrived at the hotel", done: false },
+    { id: "verificar_reserva", desc: "Emma asks if the user has a reservation", done: false },
+    { id: "datos_personales",  desc: "Emma asks for the name to find the reservation", done: false },
+    { id: "confirmar_estancia",desc: "Emma confirms how many nights the user is staying", done: false },
+    { id: "info_habitacion",   desc: "Emma gives the room number and floor", done: false },
+    { id: "entrega_llave",     desc: "Emma hands over the key card", done: false },
+    { id: "info_desayuno",     desc: "Emma mentions breakfast hours and location. Do NOT set situation_ended yet.", done: false },
+    { id: "despedida",         desc: "Emma wishes the user a pleasant stay and says goodbye. Only now set situation_ended: true", done: false }
   ],
   opening: {
     line: "Good evening! Welcome to the Stanford Hotel.",
@@ -917,8 +920,9 @@ Rules:
 - FORBIDDEN phrases: "let me", "one moment", "just a moment", "right away", "pull up", "check that", "hold on" — never use these
 - When user gives their name, immediately confirm the reservation is found and ask how many nights
 - Always end with a question or giving something to the user
-- Flow: greet → reservation? → name? → confirm + how many nights? → room info + key → breakfast → farewell
-- Maximum 2 short sentences
+- Flow: greet → reservation? → name? → how many nights? → room number → hand key card → breakfast hours → farewell
+- Only set situation_ended: true on the farewell step, never before
+- Maximum 1 short sentence. Be brief. Real people in hotels speak in short phrases, not paragraphs.
 - Fill all response fields:
   * line: your English reply (string)
   * subtitle_es: Spanish translation of your reply (string)
@@ -1361,6 +1365,28 @@ function showThinking(visible) {
 }
 
 // ─── PANTALLA FINAL ───────────────────────────────
+function copyConversation() {
+  const msgs = document.querySelectorAll('.msg-char, .msg-user');
+  let text = 'Conversación — Stanford Hotel\n\n';
+  msgs.forEach(m => {
+    const isChar = m.classList.contains('msg-char');
+    const en = m.querySelector('.msg-en');
+    const sub = m.querySelector('.msg-sub');
+    if (en) {
+      text += (isChar ? 'Emma: ' : 'Tú: ') + en.textContent + '\n';
+      if (sub) text += '      ' + sub.textContent + '\n';
+    } else {
+      text += (isChar ? 'Emma: ' : 'Tú: ') + m.textContent + '\n';
+    }
+    text += '\n';
+  });
+  navigator.clipboard.writeText(text).then(() => {
+    alert('Conversación copiada al portapapeles');
+  }).catch(() => {
+    alert('No se pudo copiar. Selecciona el texto manualmente.');
+  });
+}
+
 function showEnding() {
   const sit = SITUATION;
   const progress = getProgressSummary();
