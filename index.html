@@ -203,15 +203,7 @@ textarea.sit-input::placeholder { color: var(--ink3); }
 }
 
 /* Avatar + dialogue */
-.char-area {
-  flex-shrink: 0;
-  display: flex;
-  gap: 0.75rem;
-  padding: 1rem 1rem 0.75rem;
-  border-bottom: 1px solid var(--border);
-  background: var(--white);
-  min-height: 110px;
-}
+
 
 .avatar-wrap {
   flex-shrink: 0;
@@ -369,6 +361,7 @@ textarea.sit-input::placeholder { color: var(--ink3); }
 }
 .nm-hist-tag { font-size: 0.58rem; font-weight: 700; color: #007A3D; letter-spacing: 0.08em; text-transform: uppercase; display: block; }
 .nm-hist-phrase { font-size: 0.82rem; color: #007A3D; font-style: italic; font-weight: 500; display: block; }
+.nm-hist-actions { display: flex; gap: 0.4rem; margin-top: 0.35rem; }
 
 .thinking {
   display: none;
@@ -537,26 +530,16 @@ textarea.sit-input::placeholder { color: var(--ink3); }
     <div class="char-pill" id="char-pill"></div>
   </div>
 
-  <div class="char-area">
-    <div class="avatar-wrap" id="avatar-wrap"></div>
-    <div class="dialogue-col">
-      <div class="char-name-tag" id="char-name-tag"></div>
-      <div class="char-line" id="char-line">…</div>
-      <div class="subtitle" id="subtitle"></div>
-      <button class="sub-reveal" id="sub-reveal" onclick="revealSub()">¿qué significa?</button>
-    </div>
-    <div class="speaking-dot" id="speaking-dot"></div>
+  <div style="display:none">
+    <div id="avatar-wrap"></div>
+    <div id="char-name-tag"></div>
+    <div id="char-line"></div>
+    <div id="subtitle"></div>
+    <button id="sub-reveal"></button>
+    <div id="speaking-dot"></div>
   </div>
 
-  <div class="nm-card" id="nm-card">
-    <div class="nm-tag">Así se dice en inglés</div>
-    <div class="nm-phrase" id="nm-phrase"></div>
-    <div class="nm-actions">
-      <button class="nm-btn nm-listen" onclick="listenNM()">🔊 Escuchar</button>
-      <button class="nm-btn nm-listen" id="nm-rep" onclick="repeatNM()" style="display:none">🎙 Repetir</button>
-      <button class="nm-btn nm-skip" onclick="closeNM()">Continuar</button>
-    </div>
-  </div>
+
 
   <div class="history" id="history">
     <div class="thinking" id="thinking"><span></span><span></span><span></span></div>
@@ -832,18 +815,21 @@ function revealSub() {
 // ── NM ────────────────────────────────────────
 function showNM(phrase) {
   nmPhrase = phrase;
-  document.getElementById('nm-phrase').textContent = '\u201c' + phrase + '\u201d';
-  document.getElementById('nm-card').classList.add('on');
-  document.getElementById('nm-rep').style.display = recognition ? 'inline-block' : 'none';
   const h = document.getElementById('history');
   const t = document.getElementById('thinking');
   const card = document.createElement('div');
   card.className = 'nm-hist';
-  card.innerHTML = '<span class="nm-hist-tag">As\u00ed se dice</span><span class="nm-hist-phrase">\u201c' + phrase + '\u201d</span>';
+  card.innerHTML = 
+    '<span class="nm-hist-tag">Así se dice en inglés</span>' +
+    '<span class="nm-hist-phrase">“' + phrase + '”</span>' +
+    '<div class="nm-hist-actions">' +
+      '<button class="nm-btn nm-listen" onclick="listenNM()">🔊 Escuchar</button>' +
+      (recognition ? '<button class="nm-btn nm-listen" onclick="repeatNM()">🎙 Repetir</button>' : '') +
+    '</div>';
   h.insertBefore(card, t);
   h.scrollTop = h.scrollHeight;
 }
-function closeNM() { document.getElementById('nm-card').classList.remove('on'); }
+function closeNM() {}
 function listenNM() { if (nmPhrase) speakAt(nmPhrase, 0.65); }
 function repeatNM() { if (recognition) startRec(); }
 
@@ -931,7 +917,7 @@ function speakAt(text, rate) {
   if (!window.speechSynthesis) return;
   window.speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
-  u.lang = 'en-US'; u.rate = rate || 0.65;
+  u.lang = 'en-US'; u.rate = rate || 0.62;
   const v = voices.find(v => v.lang === 'en-US') || voices.find(v => v.lang.startsWith('en'));
   if (v) u.voice = v;
   window.speechSynthesis.speak(u);
