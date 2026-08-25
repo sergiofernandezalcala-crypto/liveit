@@ -925,24 +925,22 @@ Rules:
   * situation_ended: JSON boolean true only on farewell, JSON boolean false otherwise`;
 }
 
-// ─── LLAMADA A IA (vía proxy) ─────────────────────
+// ─── LLAMADA A IA (vía proxy → Claude) ────────────
 async function callGroq(userMessage) {
-  const messages = [
-    ...conversationHistory,
-    { role: 'user', content: userMessage }
-  ];
+  const messages = conversationHistory.map(m => ({
+    role: m.role,
+    content: m.content
+  }));
+  messages.push({ role: 'user', content: userMessage });
 
   const response = await fetch(PROXY_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: 'openai/gpt-oss-20b',
-      messages: [
-        { role: 'system', content: buildSystemPrompt() },
-        ...messages
-      ],
+      system: buildSystemPrompt(),
+      messages,
       temperature: 0.6,
-      max_tokens: 400,
+      max_tokens: 400
     })
   });
 
@@ -952,11 +950,10 @@ async function callGroq(userMessage) {
   }
 
   const data = await response.json();
-  const raw = data.choices[0].message.content;
+  const raw = data.content[0].text;
   const match = raw.match(/\{[\s\S]*\}/);
   if (!match) throw new Error('No JSON in response');
   const parsed = JSON.parse(match[0]);
-  // Coerce booleans in case model returns strings
   parsed.beat_completed  = parsed.beat_completed  === true || parsed.beat_completed  === 'true';
   parsed.situation_ended = parsed.situation_ended === true || parsed.situation_ended === 'true';
   parsed.natural_model   = parsed.natural_model || '';
