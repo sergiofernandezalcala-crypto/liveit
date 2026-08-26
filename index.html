@@ -777,37 +777,12 @@ function loadRecentSituations() {
 }
 
 function setSituation(sit) {
-  if (typeof sit !== 'string') sit = sit.dataset ? sit.dataset.sit : '';
-  // Full reset
+  // Reset all state
   hist = []; exchanges = 0; autoCont = 0; esCount = 0; enCount = 0;
   charName = ''; charRole = ''; nmPhrase = ''; subCache = ''; pendingUserText = '';
-  try {
-    document.getElementById('ending').style.display = 'none';
-    document.getElementById('experience').style.display = 'none';
-    document.getElementById('setup').style.display = 'none';
-    document.getElementById('history').querySelectorAll('.msg,.nm-hist,.cont-btn').forEach(e => e.remove());
-    document.getElementById('scene-name').textContent = '';
-    document.getElementById('sit-input').value = sit;
-  } catch(e) {}
-  // Go directly to experience, skip setup screen
-  document.getElementById('experience').style.display = 'flex';
-  document.getElementById('experience').classList.add('mood-default');
-  document.getElementById('scene-name').textContent = sit.slice(0, 50) + (sit.length > 50 ? '…' : '');
-  situation = sit;
-  saveRecentSituation(sit);
-  document.getElementById('user-input').placeholder = getInputPlaceholder();
-  if (!recognition) initSTT();
-  showThinking(true);
-  callAI('(open the scene — greet the user as the fitting character for this situation)')
-    .then(ai => {
-      showThinking(false);
-      applyChar(ai);
-      showLine(ai.line, ai.subtitle_es);
-      addMsg('char', ai.line, ai.subtitle_es);
-      hist.push({ role: 'assistant', content: ai.line });
-      handleCont(ai);
-    })
-    .catch(e => { showThinking(false); console.error(e); });
+  document.getElementById('history').querySelectorAll('.msg,.nm-hist,.cont-btn').forEach(e => e.remove());
+  document.getElementById('sit-input').value = sit;
+  startExperience();
 }
 
 async function startExperience() {
