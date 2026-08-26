@@ -101,7 +101,7 @@ textarea.sit-input {
   background: var(--paper);
   border: 1.5px solid var(--border);
   border-radius: var(--r);
-  padding: 0.9rem 1rem;
+  padding: 0.75rem 1rem;
   font-size: 0.9rem;
   font-family: var(--sans);
   color: var(--ink);
@@ -109,9 +109,10 @@ textarea.sit-input {
   resize: none;
   outline: none;
   transition: border-color 0.2s;
+  overflow: hidden;
 }
 textarea.sit-input:focus { border-color: var(--ink); }
-textarea.sit-input::placeholder { color: var(--ink3); }
+textarea.sit-input::placeholder { color: #888; }
 
 .examples {
   display: flex;
@@ -542,8 +543,8 @@ textarea.sit-input::placeholder { color: var(--ink3); }
   <div class="setup-main">
     <div class="setup-label">¿Dónde quieres estar?</div>
     <div class="setup-hint">Describe la situación. El personaje hablará en inglés. Tú responde como quieras.</div>
-    <textarea class="sit-input" id="sit-input" rows="3"
-      placeholder="Ej: Acabo de llegar a un hotel en Tokio y necesito hacer el check-in."></textarea>
+    <textarea class="sit-input" id="sit-input" rows="2"
+      placeholder="Ej: Acabo de llegar a un hotel en Tokio y necesito hacer el check-in." oninput="autoResizeSit(this)"></textarea>
     <div id="lang-hint-setup" style="font-size:0.72rem;color:var(--ink3);"></div>
     <div class="examples" style="flex-direction:column;">
       <button class="example-chip" onclick="setExample(this)">
@@ -1239,6 +1240,7 @@ function detectLang(t) {
 }
 function handleKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }
 function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 100) + 'px'; }
+function autoResizeSit(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120) + 'px'; }
 </script>
 </body>
 </html>
