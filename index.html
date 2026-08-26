@@ -785,28 +785,52 @@ function loadRecentSituations() {
 }
 
 function setSituation(sit) {
+  // Check if we have a saved conversation for this situation
+  const convs = JSON.parse(localStorage.getItem('liveit_convs') || '{}');
+  const saved = convs[sit];
+  
+  // Reset state
   hist = []; exchanges = 0; autoCont = 0; esCount = 0; enCount = 0;
   charName = ''; charRole = ''; nmPhrase = ''; subCache = ''; pendingUserText = '';
-  document.getElementById('history').querySelectorAll('.msg,.nm-hist,.cont-btn').forEach(e => e.remove());
   situation = sit;
-  saveRecentSituation(sit);
+  if (currentAudio) { currentAudio.pause(); currentAudio = null; }
+  
   document.getElementById('setup').style.display = 'none';
   document.getElementById('experience').style.display = 'flex';
   document.getElementById('experience').classList.add('mood-default');
   document.getElementById('scene-name').textContent = sit.slice(0, 50) + (sit.length > 50 ? '…' : '');
+  document.getElementById('history').innerHTML = '<div class="thinking" id="thinking"><span></span><span></span><span></span></div>';
   document.getElementById('user-input').placeholder = getInputPlaceholder();
   if (!recognition) initSTT();
-  showThinking(true);
-  callAI('(open the scene — greet the user as the fitting character for this situation)')
-    .then(function(ai) {
-      showThinking(false);
-      applyChar(ai);
-      showLine(ai.line, ai.subtitle_es);
-      addMsg('char', ai.line, ai.subtitle_es);
-      hist.push({ role: 'assistant', content: ai.line });
-      handleCont(ai);
-    })
-    .catch(function(e) { showThinking(false); alert('Error: ' + e.message); });
+
+  if (saved && saved.msgs && saved.msgs.length > 0) {
+    // Show saved conversation
+    saved.msgs.forEach(function(m) {
+      addMsg(m.role, m.text, m.sub);
+      if (m.role === 'char') hist.push({ role: 'assistant', content: m.text });
+      else hist.push({ role: 'user', content: m.text });
+    });
+    // Add a separator
+    const sep = document.createElement('div');
+    sep.className = 'msg msg-system';
+    sep.textContent = '— Conversación anterior —';
+    const h = document.getElementById('history');
+    h.insertBefore(sep, document.getElementById('thinking'));
+  } else {
+    // Start fresh
+    saveRecentSituation(sit);
+    showThinking(true);
+    callAI('(open the scene — greet the user as the fitting character for this situation)')
+      .then(function(ai) {
+        showThinking(false);
+        applyChar(ai);
+        showLine(ai.line, ai.subtitle_es);
+        addMsg('char', ai.line, ai.subtitle_es);
+        hist.push({ role: 'assistant', content: ai.line });
+        handleCont(ai);
+      })
+      .catch(function() { showThinking(false); });
+  }
 }
 
 async function startExperience(forcedSit) {
@@ -1067,21 +1091,38 @@ function goHome() {
   newSit();
 }
 
+function saveConversation() {
+  if (!situation) return;
+  const msgs = [];
+  document.getElementById('history').querySelectorAll('.msg-char, .msg-user').forEach(function(m) {
+    const isChar = m.classList.contains('msg-char');
+    const en = m.querySelector('.msg-en');
+    const sub = m.querySelector('.msg-sub');
+    msgs.push({
+      role: isChar ? 'char' : 'user',
+      text: en ? en.textContent : m.textContent,
+      sub: sub ? sub.textContent : ''
+    });
+  });
+  if (msgs.length === 0) return;
+  let convs = JSON.parse(localStorage.getItem('liveit_convs') || '{}');
+  convs[situation] = { situation: situation, msgs: msgs, date: new Date().toISOString() };
+  localStorage.setItem('liveit_convs', JSON.stringify(convs));
+}
+
 function newSit() {
+  saveConversation();
   // Reset ALL state completely
   hist = []; exchanges = 0; autoCont = 0; esCount = 0; enCount = 0;
   charName = ''; charRole = ''; nmPhrase = ''; subCache = '';
   situation = ''; pendingUserText = ''; lastUserMsg = '';
-  // Stop any audio
   if (currentAudio) { currentAudio.pause(); currentAudio = null; }
   isSpeaking = false;
-  // Reset UI
   document.getElementById('ending').style.display = 'none';
   document.getElementById('experience').style.display = 'none';
   document.getElementById('history').innerHTML = '<div class="thinking" id="thinking"><span></span><span></span><span></span></div>';
   document.getElementById('scene-name').textContent = '';
   document.getElementById('sit-input').value = '';
-  // Show setup
   document.getElementById('setup').style.display = 'flex';
   loadRecentSituations();
 }
