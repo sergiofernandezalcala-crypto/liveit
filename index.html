@@ -1068,17 +1068,19 @@ function goHome() {
 }
 
 function newSit() {
-  // Reset state
+  // Reset ALL state completely
   hist = []; exchanges = 0; autoCont = 0; esCount = 0; enCount = 0;
   charName = ''; charRole = ''; nmPhrase = ''; subCache = '';
+  situation = ''; pendingUserText = ''; lastUserMsg = '';
+  // Stop any audio
+  if (currentAudio) { currentAudio.pause(); currentAudio = null; }
+  isSpeaking = false;
   // Reset UI
-  try {
-    document.getElementById('ending').style.display = 'none';
-    document.getElementById('experience').style.display = 'none';
-    document.getElementById('history').querySelectorAll('.msg,.nm-hist,.cont-btn').forEach(e => e.remove());
-    document.getElementById('scene-name').textContent = '';
-    document.getElementById('sit-input').value = '';
-  } catch(e) {}
+  document.getElementById('ending').style.display = 'none';
+  document.getElementById('experience').style.display = 'none';
+  document.getElementById('history').innerHTML = '<div class="thinking" id="thinking"><span></span><span></span><span></span></div>';
+  document.getElementById('scene-name').textContent = '';
+  document.getElementById('sit-input').value = '';
   // Show setup
   document.getElementById('setup').style.display = 'flex';
   loadRecentSituations();
