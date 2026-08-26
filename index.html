@@ -40,18 +40,17 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-height: 100dvh;
+  height: 100dvh;
   padding: 1.5rem;
-  padding-bottom: 2rem;
   background: var(--white);
-  overflow-y: auto;
+  overflow: hidden;
 }
 
 .setup-top {
   width: 100%;
   max-width: 400px;
-  margin-bottom: auto;
-  padding-top: 2rem;
+  margin-bottom: 1.5rem;
+  padding-top: 1.5rem;
 }
 
 .wordmark {
@@ -121,10 +120,10 @@ textarea.sit-input::placeholder { color: var(--ink3); }
 }
 
 .example-chip {
-  padding: 0.5rem 0.85rem;
+  padding: 0.35rem 0.75rem;
   background: #E8FFF2;
   border: none;
-  border-radius: 12px;
+  border-radius: 10px;
   font-size: 0.78rem;
   color: var(--ink);
   cursor: pointer;
@@ -154,8 +153,8 @@ textarea.sit-input::placeholder { color: var(--ink3); }
   transition: border-color 0.15s;
 }
 .recent-chip:hover { border-color: #00E676; color: var(--ink); }
-.recent-chip-wrap { display: flex; align-items: center; justify-content: space-between; padding: 0.45rem 0.75rem; background: var(--white); border: 1.5px solid var(--border); border-radius: 8px; margin-bottom: 0.3rem; }
-.recent-chip-text { font-size: 0.8rem; color: var(--ink2); flex: 1; }
+.recent-chip-wrap { display: flex; align-items: center; justify-content: space-between; padding: 0.35rem 0.65rem; background: var(--white); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 0.2rem; }
+.recent-chip-text { font-size: 0.75rem; color: var(--ink2); flex: 1; }
 .recent-chip-btn { background: #00E676; border: none; border-radius: 6px; padding: 0.2rem 0.6rem; font-size: 0.72rem; font-weight: 700; color: var(--ink); cursor: pointer; font-family: var(--sans); white-space: nowrap; margin-left: 0.5rem; }
 .recent-chip-btn:hover { opacity: 0.8; }
 .chip-main { font-weight: 600; color: #111; font-size: 1rem; }
@@ -751,7 +750,7 @@ async function callAI(userMsg) {
 // ── START ─────────────────────────────────────
 function saveRecentSituation(sit) {
   let recent = JSON.parse(localStorage.getItem('liveit_recent') || '[]');
-  recent = [sit, ...recent.filter(s => s !== sit)].slice(0, 5);
+  recent = [sit, ...recent.filter(s => s !== sit)].slice(0, 3);
   localStorage.setItem('liveit_recent', JSON.stringify(recent));
 }
 
