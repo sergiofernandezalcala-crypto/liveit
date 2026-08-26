@@ -629,7 +629,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (s) s.textContent = hints[0];
   if (e) e.textContent = hints[1];
 });
-let situation = '', charName = '', charRole = '';
+let situation = '', charName = '', charRole = '', pendingUserText = '';
 let hist = [], exchanges = 0, autoCont = 0, nmPhrase = '', lastUserMsg = '';
 let isSpeaking = false, voices = [], recognition = null, isRec = false;
 let esCount = 0, enCount = 0, subCache = '';
@@ -672,7 +672,7 @@ function buildPrompt() {
 
 Stay in character throughout as a real person would. Do not introduce yourself by name unless the user asks.
 
-The user's native language may not be Spanish or English — they could be a speaker of any language. Always provide subtitle_es in their native language if possible, but Spanish as fallback. The user may write in any language — always understand and continue. Always understand their intention and continue — never say you don't understand, never break character.
+The user's native language may not be Spanish or English — they could be a speaker of any language. Always provide subtitle_es in their native language if possible, but Spanish as fallback. The user may write in any language — always understand and continue. IMPORTANT: the user may also write phonetic English based on their native language (e.g. a Spanish speaker writing 'tenquiu' for 'thank you', 'ai wont' for 'I want', 'jau ar yu' for 'how are you'; a French speaker writing 'sank you' or 'allo'; a Japanese speaker writing 'sank yu' etc). Always recognize and accept phonetic English as valid English input — treat it as correct and continue naturally. Always understand their intention and continue — never say you don't understand, never break character.
 
 If the user says something grammatically imperfect, naturally reflect the correct form in your reply without explicitly correcting them.
 
@@ -751,6 +751,7 @@ async function send() {
   closeNM(); autoCont = 0; exchanges++;
   detectLang(text) === 'es' ? esCount++ : enCount++;
   lastUserMsg = text;
+  pendingUserText = text;
   addMsg('user', text);
   hist.push({ role: 'user', content: text });
   showThinking(true);
@@ -761,7 +762,19 @@ async function send() {
     showLine(ai.line, ai.subtitle_es);
     addMsg('char', ai.line, ai.subtitle_es);
     hist.push({ role: 'assistant', content: ai.line });
-    if (ai.natural_model) showNM(ai.natural_model, lastUserMsg);
+    if (ai.natural_model) {
+    // Update last user message to include nm inline
+    const userMsgs = document.querySelectorAll('.msg-user');
+    const lastUserEl = userMsgs[userMsgs.length - 1];
+    if (lastUserEl && !lastUserEl.querySelector('.msg-nm')) {
+      const nmSpan = document.createElement('span');
+      nmSpan.className = 'msg-nm';
+      nmSpan.textContent = ai.natural_model + ' 🔊';
+      nmSpan.onclick = () => speakAt(ai.natural_model, 0.65);
+      lastUserEl.innerHTML = '<span class="msg-en">' + esc(pendingUserText) + '</span>';
+      lastUserEl.appendChild(nmSpan);
+    }
+  }
     handleCont(ai);
   } catch(e) {
     showThinking(false);
@@ -774,7 +787,7 @@ async function send() {
       showLine(ai2.line, ai2.subtitle_es);
       addMsg('char', ai2.line, ai2.subtitle_es);
       hist.push({ role: 'assistant', content: ai2.line });
-      if (ai2.natural_model) showNM(ai2.natural_model, lastUserMsg);
+      
       handleCont(ai2);
     } catch(e2) {
       showThinking(false);
@@ -935,13 +948,16 @@ function listenNM() { if (nmPhrase) speakAt(nmPhrase, 0.65); }
 function repeatNM() { if (recognition) startRec(); }
 
 // ── HISTORY ───────────────────────────────────
-function addMsg(role, text, sub) {
+function addMsg(role, text, sub, nmPhraseTxt) {
   const h = document.getElementById('history');
   const t = document.getElementById('thinking');
   const m = document.createElement('div');
   m.className = 'msg msg-' + (role === 'char' ? 'char' : role === 'user' ? 'user' : 'system');
   if (role === 'char' && sub) {
     m.innerHTML = '<span class="msg-en">' + esc(text) + '</span><span class="msg-sub">' + esc(sub) + '</span>';
+  } else if (role === 'user' && nmPhraseTxt) {
+    m.innerHTML = '<span class="msg-en">' + esc(text) + '</span><span class="msg-nm">' + esc(nmPhraseTxt) + ' 🔊</span>';
+    m.querySelector('.msg-nm').onclick = () => speakAt(nmPhraseTxt, 0.65);
   } else {
     m.textContent = text;
   }
