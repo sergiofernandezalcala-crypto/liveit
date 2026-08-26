@@ -136,6 +136,23 @@ textarea.sit-input::placeholder { color: var(--ink3); }
   width: 100%;
 }
 .example-chip:hover { background: #C8F5DC; }
+.recent-label { font-size: 0.68rem; color: var(--ink3); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.4rem; }
+.recent-chip {
+  display: block;
+  width: 100%;
+  padding: 0.45rem 0.75rem;
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.8rem;
+  color: var(--ink2);
+  cursor: pointer;
+  font-family: var(--sans);
+  text-align: left;
+  margin-bottom: 0.3rem;
+  transition: border-color 0.15s;
+}
+.recent-chip:hover { border-color: #00E676; color: var(--ink); }
 .chip-main { font-weight: 500; color: var(--ink); }
 .chip-sub  { font-size: 0.68rem; color: var(--ink3); }
 
@@ -546,6 +563,7 @@ textarea.sit-input::placeholder { color: var(--ink3); }
         <span class="chip-sub">Roma · Restaurante</span>
       </button>
     </div>
+    <div id="recent-situations" style="display:none;margin-top:0.5rem;"></div>
     <button class="btn-go" onclick="startExperience()">Entrar en la situación →</button>
   </div>
 
@@ -637,6 +655,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const e = document.getElementById('lang-hint-exp');
   if (s) s.textContent = hints[0];
   if (e) e.textContent = hints[1];
+  loadRecentSituations();
 });
 let situation = '', charName = '', charRole = '', pendingUserText = '';
 let hist = [], exchanges = 0, autoCont = 0, nmPhrase = '', lastUserMsg = '';
@@ -733,9 +752,31 @@ async function callAI(userMsg) {
 }
 
 // ── START ─────────────────────────────────────
+function saveRecentSituation(sit) {
+  let recent = JSON.parse(localStorage.getItem('liveit_recent') || '[]');
+  recent = [sit, ...recent.filter(s => s !== sit)].slice(0, 5);
+  localStorage.setItem('liveit_recent', JSON.stringify(recent));
+}
+
+function loadRecentSituations() {
+  const recent = JSON.parse(localStorage.getItem('liveit_recent') || '[]');
+  const container = document.getElementById('recent-situations');
+  if (!container) return;
+  if (recent.length === 0) { container.style.display = 'none'; return; }
+  container.style.display = 'block';
+  container.innerHTML = '<div class="recent-label">Situaciones recientes</div>' +
+    recent.map(s => `<button class="recent-chip" onclick="setSituation(this)" data-sit="${s.replace(/"/g,'&quot;')}">${s.slice(0,50)}${s.length>50?'…':''}</button>`).join('');
+}
+
+function setSituation(btn) {
+  document.getElementById('sit-input').value = btn.dataset.sit;
+}
+
 async function startExperience() {
   situation = document.getElementById('sit-input').value.trim();
   if (!situation) { alert('Describe tu situación primero.'); return; }
+  // Save to recent situations
+  saveRecentSituation(situation);
   document.getElementById('setup').style.display = 'none';
   document.getElementById('experience').style.display = 'flex';
   document.getElementById('experience').classList.add('mood-default');
