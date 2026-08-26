@@ -769,7 +769,15 @@ function loadRecentSituations() {
 }
 
 function setSituation(btn) {
-  document.getElementById('sit-input').value = btn.dataset.sit;
+  const sit = btn.dataset.sit;
+  // Reset state completely first
+  hist = []; exchanges = 0; autoCont = 0; esCount = 0; enCount = 0;
+  charName = ''; charRole = ''; nmPhrase = ''; subCache = ''; pendingUserText = '';
+  try {
+    document.getElementById('ending').style.display = 'none';
+    document.getElementById('history').querySelectorAll('.msg,.nm-hist,.cont-btn').forEach(e => e.remove());
+  } catch(e) {}
+  document.getElementById('sit-input').value = sit;
   startExperience();
 }
 
