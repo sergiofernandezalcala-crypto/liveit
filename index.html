@@ -776,18 +776,15 @@ function loadRecentSituations() {
 }
 
 function setSituation(sit) {
-  // Reset all state
   hist = []; exchanges = 0; autoCont = 0; esCount = 0; enCount = 0;
   charName = ''; charRole = ''; nmPhrase = ''; subCache = ''; pendingUserText = '';
   document.getElementById('history').querySelectorAll('.msg,.nm-hist,.cont-btn').forEach(e => e.remove());
-  document.getElementById('sit-input').value = sit;
-  startExperience();
+  startExperience(sit);
 }
 
-async function startExperience() {
-  situation = document.getElementById('sit-input').value.trim();
+async function startExperience(forcedSit) {
+  situation = forcedSit || document.getElementById('sit-input').value.trim();
   if (!situation) { alert('Describe tu situación primero.'); return; }
-  // Save to recent situations
   saveRecentSituation(situation);
   document.getElementById('setup').style.display = 'none';
   document.getElementById('experience').style.display = 'flex';
