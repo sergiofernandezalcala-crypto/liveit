@@ -796,7 +796,8 @@ function setSituation(sit) {
   situation = sit;
   saveRecentSituation(sit);
   document.getElementById('user-input').placeholder = getInputPlaceholder();
-  initSTT(); loadVoices(); showThinking(true);
+  if (!recognition) initSTT();
+  showThinking(true);
   callAI('(open the scene — greet the user as the fitting character for this situation)')
     .then(ai => {
       showThinking(false);
@@ -806,7 +807,7 @@ function setSituation(sit) {
       hist.push({ role: 'assistant', content: ai.line });
       handleCont(ai);
     })
-    .catch(() => showThinking(false));
+    .catch(e => { showThinking(false); console.error(e); });
 }
 
 async function startExperience() {
@@ -1083,6 +1084,7 @@ function newSit() {
   } catch(e) {}
   // Show setup
   document.getElementById('setup').style.display = 'flex';
+  loadRecentSituations();
 }
 function copyConv() {
   const msgs = document.querySelectorAll('.msg-char,.msg-user');
