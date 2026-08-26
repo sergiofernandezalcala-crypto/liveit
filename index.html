@@ -840,9 +840,8 @@ function handleCont(ai) {
   if (!ai.expects_user_input && autoCont < 1) {
     autoCont++;
     setTimeout(autoContinue, 1200);
-  } else if (!ai.expects_user_input) {
-    showContBtn();
   }
+  // No continuar button — user writes when ready
 }
 
 async function autoContinue() {
