@@ -806,7 +806,7 @@ function setSituation(sit) {
       hist.push({ role: 'assistant', content: ai.line });
       handleCont(ai);
     })
-    .catch(function() { showThinking(false); });
+    .catch(function(e) { showThinking(false); alert('Error: ' + e.message); });
 }
 
 async function startExperience(forcedSit) {
