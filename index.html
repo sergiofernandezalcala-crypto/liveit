@@ -55,7 +55,7 @@ body {
 
 .wordmark {
   font-family: 'Comfortaa', var(--sans);
-  font-size: 3.8rem;
+  font-size: clamp(2.8rem, 10vw, 4.5rem);
   font-weight: 300;
   line-height: 1;
   letter-spacing: -0.01em;
@@ -84,7 +84,7 @@ body {
 }
 
 .setup-label {
-  font-size: 1.4rem;
+  font-size: clamp(1.4rem, 5vw, 1.8rem);
   font-weight: 600;
   color: var(--ink);
 }
@@ -102,7 +102,7 @@ textarea.sit-input {
   border: 1.5px solid var(--border);
   border-radius: var(--r);
   padding: 0.85rem 1rem;
-  font-size: 1rem;
+  font-size: clamp(1rem, 3.5vw, 1.1rem);
   font-family: var(--sans);
   color: var(--ink);
   line-height: 1.55;
@@ -536,7 +536,7 @@ textarea.sit-input::placeholder { color: #888; }
 <!-- SETUP -->
 <div id="setup">
   <div class="setup-top">
-    <div class="wordmark" style="cursor:pointer;" onclick="if(document.getElementById('experience').style.display==='flex'){newSit();}"><span style="color:#00E676;">e</span><span style="color:#111111;">ablo</span></div>
+    <div class="wordmark" style="cursor:pointer;" onclick="document.getElementById('sit-input').value=''; document.getElementById('sit-input').style.height='auto';"><span style="color:#00E676;">e</span><span style="color:#111111;">ablo</span></div>
     <div class="sub">Vive en inglés, mientras lo aprendes.</div>
   </div>
 
