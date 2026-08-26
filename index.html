@@ -807,6 +807,16 @@ function setSituation(sit) {
     // Show saved conversation
     saved.msgs.forEach(function(m) {
       addMsg(m.role, m.text, m.sub);
+      // Restore nm translation on user messages
+      if (m.role === 'user' && m.nm) {
+        const userMsgs = document.querySelectorAll('.msg-user');
+        const lastEl = userMsgs[userMsgs.length - 1];
+        if (lastEl) {
+          const nm = m.nm;
+          lastEl.innerHTML = '<span class="msg-en">' + esc(m.text) + '</span><span class="msg-nm">' + esc(nm) + '</span>';
+          lastEl.onclick = function() { speakAt(nm); };
+        }
+      }
       if (m.role === 'char') hist.push({ role: 'assistant', content: m.text });
       else hist.push({ role: 'user', content: m.text });
     });
@@ -1098,10 +1108,12 @@ function saveConversation() {
     const isChar = m.classList.contains('msg-char');
     const en = m.querySelector('.msg-en');
     const sub = m.querySelector('.msg-sub');
+    const nm = m.querySelector('.msg-nm');
     msgs.push({
       role: isChar ? 'char' : 'user',
       text: en ? en.textContent : m.textContent,
-      sub: sub ? sub.textContent : ''
+      sub: sub ? sub.textContent : '',
+      nm: nm ? nm.textContent : ''
     });
   });
   if (msgs.length === 0) return;
