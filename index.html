@@ -788,7 +788,25 @@ function setSituation(sit) {
   hist = []; exchanges = 0; autoCont = 0; esCount = 0; enCount = 0;
   charName = ''; charRole = ''; nmPhrase = ''; subCache = ''; pendingUserText = '';
   document.getElementById('history').querySelectorAll('.msg,.nm-hist,.cont-btn').forEach(e => e.remove());
-  startExperience(sit);
+  situation = sit;
+  saveRecentSituation(sit);
+  document.getElementById('setup').style.display = 'none';
+  document.getElementById('experience').style.display = 'flex';
+  document.getElementById('experience').classList.add('mood-default');
+  document.getElementById('scene-name').textContent = sit.slice(0, 50) + (sit.length > 50 ? '…' : '');
+  document.getElementById('user-input').placeholder = getInputPlaceholder();
+  if (!recognition) initSTT();
+  showThinking(true);
+  callAI('(open the scene — greet the user as the fitting character for this situation)')
+    .then(function(ai) {
+      showThinking(false);
+      applyChar(ai);
+      showLine(ai.line, ai.subtitle_es);
+      addMsg('char', ai.line, ai.subtitle_es);
+      hist.push({ role: 'assistant', content: ai.line });
+      handleCont(ai);
+    })
+    .catch(function() { showThinking(false); });
 }
 
 async function startExperience(forcedSit) {
