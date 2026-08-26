@@ -851,7 +851,7 @@ async function autoContinue() {
     showLine(ai.line, ai.subtitle_es);
     addMsg('char', ai.line, ai.subtitle_es);
     hist.push({ role: 'assistant', content: ai.line });
-    if (ai.natural_model) showNM(ai.natural_model);
+    // nm handled inline in user bubble
     handleCont(ai);
   } catch(e) { showThinking(false); }
 }
