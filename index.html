@@ -1018,38 +1018,37 @@ function copyConv() {
 }
 
 // ── TTS ───────────────────────────────────────
-function loadVoices() {
-  voices = window.speechSynthesis.getVoices();
-  if (!voices.length) window.speechSynthesis.onvoiceschanged = () => { voices = window.speechSynthesis.getVoices(); };
+function loadVoices() {} // Google TTS
+function waitForVoices(text) { speak(text); }
+
+let currentAudio = null;
+
+async function speak(text) {
+  if (!text) return;
+  try {
+    if (currentAudio) { currentAudio.pause(); currentAudio = null; }
+    document.getElementById('speaking-dot').classList.add('on');
+    isSpeaking = true;
+    const res = await fetch('/api/tts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text })
+    });
+    const data = await res.json();
+    if (!data.audioContent) throw new Error('No audio');
+    const audio = new Audio('data:audio/mp3;base64,' + data.audioContent);
+    currentAudio = audio;
+    audio.onended = () => { isSpeaking = false; document.getElementById('speaking-dot').classList.remove('on'); currentAudio = null; };
+    audio.onerror = () => { isSpeaking = false; document.getElementById('speaking-dot').classList.remove('on'); };
+    audio.play();
+  } catch(e) {
+    isSpeaking = false;
+    document.getElementById('speaking-dot').classList.remove('on');
+  }
 }
-function waitForVoices(text) {
-  if (voices.length) { speak(text); return; }
-  let n = 0;
-  const t = setInterval(() => {
-    voices = window.speechSynthesis.getVoices();
-    if (voices.length || ++n > 20) { clearInterval(t); speak(text); }
-  }, 100);
-}
-function speak(text) {
-  if (!window.speechSynthesis) return;
-  window.speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang = 'en-US'; u.rate = 0.72; u.pitch = 0.9;
-  const v = voices.find(v => v.lang === 'en-US') || voices.find(v => v.lang.startsWith('en'));
-  if (v) u.voice = v;
-  u.onstart = () => { isSpeaking = true; document.getElementById('speaking-dot').classList.add('on'); };
-  u.onend   = () => { isSpeaking = false; document.getElementById('speaking-dot').classList.remove('on'); };
-  window.speechSynthesis.speak(u);
-}
-function speakAt(text, rate) {
-  if (!window.speechSynthesis) return;
-  window.speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang = 'en-US'; u.rate = rate || 0.65;
-  const v = voices.find(v => v.lang === 'en-US') || voices.find(v => v.lang.startsWith('en'));
-  if (v) u.voice = v;
-  window.speechSynthesis.speak(u);
-}
+
+function speakAt(text) { speak(text); }
+
 
 // ── STT ───────────────────────────────────────
 function getInputPlaceholder() {
