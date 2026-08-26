@@ -67,8 +67,8 @@ body {
 
 .sub {
   margin-top: 0.5rem;
-  font-size: 0.95rem;
-  color: var(--ink2);
+  font-size: 1rem;
+  color: #444;
   letter-spacing: 0.02em;
   font-style: italic;
 }
@@ -84,7 +84,7 @@ body {
 }
 
 .setup-label {
-  font-size: 1.1rem;
+  font-size: 1.25rem;
   font-weight: 600;
   color: var(--ink);
 }
@@ -157,8 +157,8 @@ textarea.sit-input::placeholder { color: var(--ink3); }
 .recent-chip-text { font-size: 0.8rem; color: var(--ink2); flex: 1; }
 .recent-chip-btn { background: #00E676; border: none; border-radius: 6px; padding: 0.2rem 0.6rem; font-size: 0.72rem; font-weight: 700; color: var(--ink); cursor: pointer; font-family: var(--sans); white-space: nowrap; margin-left: 0.5rem; }
 .recent-chip-btn:hover { opacity: 0.8; }
-.chip-main { font-weight: 600; color: var(--ink); font-size: 0.9rem; }
-.chip-sub  { font-size: 0.75rem; color: var(--ink2); }
+.chip-main { font-weight: 600; color: #111; font-size: 1rem; }
+.chip-sub  { font-size: 0.8rem; color: #555; }
 
 .btn-go {
   width: 100%;
@@ -347,7 +347,7 @@ textarea.sit-input::placeholder { color: var(--ink3); }
   max-width: 82%;
   padding: 0.65rem 1rem;
   border-radius: 14px;
-  font-size: 0.95rem;
+  font-size: 1.05rem;
   line-height: 1.5;
   animation: fadeIn 0.25s ease;
 }
@@ -382,7 +382,7 @@ textarea.sit-input::placeholder { color: var(--ink3); }
 }
 
 .msg-en { display: block; }
-.msg-sub { display: block; font-size: 0.82rem; color: var(--ink2); margin-top: 0.2rem; font-style: italic; }
+.msg-sub { display: block; font-size: 0.88rem; color: #555; margin-top: 0.2rem; font-style: italic; }
 
 .nm-hist {
   align-self: flex-end;
@@ -478,7 +478,7 @@ textarea.sit-input::placeholder { color: var(--ink3); }
 .btn-send:disabled { opacity: 0.25; }
 .btn-mic svg, .btn-send svg { width: 16px; height: 16px; }
 
-.hint { margin-top: 0.3rem; font-size: 0.78rem; color: var(--ink2); text-align: center; }
+.hint { margin-top: 0.3rem; font-size: 0.85rem; color: #555; text-align: center; }
 
 /* Ending */
 #ending {
@@ -535,7 +535,7 @@ textarea.sit-input::placeholder { color: var(--ink3); }
 <!-- SETUP -->
 <div id="setup">
   <div class="setup-top">
-    <div class="wordmark"><span style="color:#00E676;">e</span><span style="color:#111111;">ablo</span></div>
+    <div class="wordmark" style="cursor:pointer;" onclick="if(document.getElementById('experience').style.display==='flex'){newSit();}"><span style="color:#00E676;">e</span><span style="color:#111111;">ablo</span></div>
     <div class="sub">Vive en inglés, mientras lo aprendes.</div>
   </div>
 
