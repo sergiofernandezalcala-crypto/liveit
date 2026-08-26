@@ -763,22 +763,15 @@ function loadRecentSituations() {
   container.style.display = 'block';
   const label = document.createElement('div');
   label.className = 'recent-label';
-  label.textContent = 'Situaciones recientes';
+  label.textContent = 'Situaciones recientes — pulsa para repetir';
   container.appendChild(label);
   recent.forEach(function(s) {
-    const wrap = document.createElement('div');
-    wrap.className = 'recent-chip-wrap';
-    const txt = document.createElement('span');
-    txt.className = 'recent-chip-text';
-    txt.textContent = s.length > 50 ? s.slice(0, 50) + '…' : s;
-    const btn = document.createElement('button');
-    btn.className = 'recent-chip-btn';
-    btn.type = 'button';
-    btn.textContent = '↺ Repetir';
-    btn.addEventListener('click', function() { setSituation(s); });
-    wrap.appendChild(txt);
-    wrap.appendChild(btn);
-    container.appendChild(wrap);
+    const chip = document.createElement('div');
+    chip.className = 'recent-chip';
+    chip.textContent = (s.length > 55 ? s.slice(0, 55) + '…' : s) + ' ↺';
+    chip.style.cursor = 'pointer';
+    chip.onclick = function() { setSituation(s); };
+    container.appendChild(chip);
   });
 }
 
