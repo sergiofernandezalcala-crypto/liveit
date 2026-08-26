@@ -336,9 +336,13 @@ textarea.sit-input::placeholder { color: var(--ink3); }
   align-self: flex-start;
   background: var(--white);
   border: 1px solid var(--border);
+  border-left: 3px solid #00E676;
   border-bottom-left-radius: 3px;
   color: var(--ink);
+  cursor: pointer;
+  transition: background 0.15s;
 }
+.msg-char:hover { background: #f5fff8; }
 .msg-user {
   align-self: flex-end;
   background: var(--ink);
@@ -772,8 +776,9 @@ async function send() {
     const lastUserEl = userMsgs[userMsgs.length - 1];
     if (lastUserEl && !lastUserEl.querySelector('.msg-nm')) {
       lastUserEl.innerHTML = '<span class="msg-en">' + esc(pendingUserText) + '</span>' +
-        '<span class="msg-nm">' + esc(ai.natural_model) + ' <span class="msg-nm-listen">🔊</span></span>';
-      lastUserEl.querySelector('.msg-nm-listen').onclick = () => speakAt(ai.natural_model, 0.65);
+        '<span class="msg-nm">' + esc(ai.natural_model) + '</span>';
+      lastUserEl.querySelector('.msg-nm').style.cursor = 'pointer';
+      lastUserEl.querySelector('.msg-nm').onclick = () => speakAt(ai.natural_model, 0.65);
     }
   }
     handleCont(ai);
@@ -956,9 +961,10 @@ function addMsg(role, text, sub) {
   m.className = 'msg msg-' + (role === 'char' ? 'char' : role === 'user' ? 'user' : 'system');
   if (role === 'char') {
     const subHtml = sub ? '<span class="msg-sub">' + esc(sub) + '</span>' : '';
-    const lineText = esc(text);
-    m.innerHTML = '<span class="msg-en">' + lineText + '</span>' + subHtml + '<span class="msg-listen" title="Escuchar">🔊</span>';
-    m.querySelector('.msg-listen').onclick = () => speakAt(text, 0.72);
+    m.innerHTML = '<span class="msg-en">' + esc(text) + '</span>' + subHtml;
+    m.style.cursor = 'pointer';
+    m.title = 'Toca para escuchar';
+    m.onclick = () => speakAt(text, 0.72);
   } else {
     m.textContent = text;
   }
