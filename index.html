@@ -516,6 +516,7 @@ textarea.sit-input::placeholder { color: var(--ink3); }
     <div class="setup-hint">Describe la situación. El personaje hablará en inglés. Tú responde como quieras.</div>
     <textarea class="sit-input" id="sit-input" rows="3"
       placeholder="Ej: Acabo de llegar a un hotel en Tokio y necesito hacer el check-in."></textarea>
+    <div id="lang-hint-setup" style="font-size:0.72rem;color:var(--ink3);"></div>
     <div class="examples" style="flex-direction:column;">
       <button class="example-chip" onclick="setExample(this)">
         <span class="chip-main">Me han perdido la maleta</span>
@@ -541,7 +542,8 @@ textarea.sit-input::placeholder { color: var(--ink3); }
     <button class="btn-go" onclick="startExperience()">Entrar en la situación →</button>
   </div>
 
-  <div class="setup-bottom" id="lang-hint-setup"></div>
+
+
 </div>
 
 <!-- EXPERIENCE -->
@@ -609,7 +611,7 @@ const PROXY = '/api/chat';
 // ── LANGUAGE DETECTION ────────────────────────
 const userLang = (navigator.language || navigator.userLanguage || 'es').split('-')[0].toLowerCase();
 const langHints = {
-  es: ['Puedes escribir en español en cualquier momento.', 'Español o inglés — la situación no se detiene.'],
+  es: ['Escribe en español, o como te suene en inglés. También puedes dictarlo.', 'Escribe en español, o como te suene en inglés. También puedes dictarlo.'],
   fr: ['Tu peux écrire en français à tout moment.', 'Français ou anglais — la situation continue.'],
   pt: ['Podes escrever em português a qualquer momento.', 'Português ou inglês — a situação não para.'],
   it: ['Puoi scrivere in italiano in qualsiasi momento.', 'Italiano o inglese — la situazione continua.'],
@@ -682,7 +684,7 @@ When the user has achieved their goal, set situation_ended to true.
 
 Always use the most basic English words. If there is a simpler word, use it. Never use formal or complex language.
 
-Always use correct grammar — "You're welcome" not "You welcome".
+Always use correct grammar — "You're welcome" not "You welcome". Match the user's tone and register: if they are casual and relaxed, respond casually; if formal, respond formally. Mirror their energy naturally, as a real person would.
 
 For natural_model — ALWAYS fill this field:
 - User wrote in Spanish → translate to natural English ("Quiero una pizza" → "I'd like a pizza, please")
