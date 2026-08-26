@@ -551,16 +551,8 @@ textarea.sit-input::placeholder { color: var(--ink3); }
         <span class="chip-sub">Bangkok · Aeropuerto</span>
       </button>
       <button class="example-chip" onclick="setExample(this)">
-        <span class="chip-main">La reserva del hotel no aparece</span>
-        <span class="chip-sub">Nueva York · Hotel</span>
-      </button>
-      <button class="example-chip" onclick="setExample(this)">
         <span class="chip-main">Quiero regatear en el mercado</span>
         <span class="chip-sub">Marrakech · Mercado</span>
-      </button>
-      <button class="example-chip" onclick="setExample(this)">
-        <span class="chip-main">Quiero devolver algo que compré ayer</span>
-        <span class="chip-sub">Milán · Tienda de moda</span>
       </button>
       <button class="example-chip" onclick="setExample(this)">
         <span class="chip-main">El camarero no me entiende</span>
@@ -610,7 +602,7 @@ textarea.sit-input::placeholder { color: var(--ink3); }
         </svg>
       </button>
       <textarea id="user-input" class="text-input" rows="1"
-        id="user-input-placeholder" placeholder="Escribe en español o en inglés…"
+        placeholder="Escribe en español o en inglés…"
         onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
       <button class="btn-send" id="send-btn" onclick="send()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -1067,7 +1059,6 @@ function newSit() {
     document.getElementById('ending').style.display = 'none';
     document.getElementById('experience').style.display = 'none';
     document.getElementById('history').querySelectorAll('.msg,.nm-hist,.cont-btn').forEach(e => e.remove());
-    document.getElementById('char-pill').textContent = '';
     document.getElementById('scene-name').textContent = '';
     document.getElementById('sit-input').value = '';
   } catch(e) {}
