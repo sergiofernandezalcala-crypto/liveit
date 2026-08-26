@@ -49,13 +49,13 @@ body {
 .setup-top {
   width: 100%;
   max-width: 400px;
-  margin-bottom: 1.5rem;
-  padding-top: 1.5rem;
+  margin-bottom: 2rem;
+  padding-top: 2.5rem;
 }
 
 .wordmark {
   font-family: 'Comfortaa', var(--sans);
-  font-size: 3rem;
+  font-size: 3.8rem;
   font-weight: 300;
   line-height: 1;
   letter-spacing: -0.01em;
@@ -67,7 +67,7 @@ body {
 
 .sub {
   margin-top: 0.5rem;
-  font-size: 1rem;
+  font-size: 1.05rem;
   color: #444;
   letter-spacing: 0.02em;
   font-style: italic;
@@ -154,8 +154,8 @@ textarea.sit-input::placeholder { color: #888; }
   transition: border-color 0.15s;
 }
 .recent-chip:hover { border-color: #00E676; color: var(--ink); }
-.recent-chip-wrap { display: flex; align-items: center; justify-content: space-between; padding: 0.35rem 0.65rem; background: var(--white); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 0.2rem; }
-.recent-chip-text { font-size: 0.75rem; color: var(--ink2); flex: 1; }
+.recent-chip-wrap { display: flex; align-items: center; justify-content: space-between; padding: 0.55rem 0.85rem; background: var(--white); border: 1.5px solid var(--border); border-radius: 10px; margin-bottom: 0.4rem; }
+.recent-chip-text { font-size: 0.88rem; color: var(--ink2); flex: 1; }
 .recent-chip-btn { background: #00E676; border: none; border-radius: 6px; padding: 0.2rem 0.6rem; font-size: 0.72rem; font-weight: 700; color: var(--ink); cursor: pointer; font-family: var(--sans); white-space: nowrap; margin-left: 0.5rem; }
 .recent-chip-btn:hover { opacity: 0.8; }
 .chip-main { font-weight: 600; color: #111; font-size: 1rem; }
@@ -543,25 +543,12 @@ textarea.sit-input::placeholder { color: #888; }
   <div class="setup-main">
     <div class="setup-label">¿Dónde quieres estar?</div>
     <div class="setup-hint">Describe la situación. El personaje hablará en inglés. Tú responde como quieras.</div>
-    <textarea class="sit-input" id="sit-input" rows="2"
+    <textarea class="sit-input" id="sit-input" rows="4"
       placeholder="Ej: Acabo de llegar a un hotel en Tokio y necesito hacer el check-in." oninput="autoResizeSit(this)"></textarea>
     <div id="lang-hint-setup" style="font-size:0.72rem;color:var(--ink3);"></div>
-    <div class="examples" style="flex-direction:column;">
-      <button class="example-chip" onclick="setExample(this)">
-        <span class="chip-main">Me han perdido la maleta</span>
-        <span class="chip-sub">Bangkok · Aeropuerto</span>
-      </button>
-      <button class="example-chip" onclick="setExample(this)">
-        <span class="chip-main">Quiero regatear en el mercado</span>
-        <span class="chip-sub">Marrakech · Mercado</span>
-      </button>
-      <button class="example-chip" onclick="setExample(this)">
-        <span class="chip-main">El camarero no me entiende</span>
-        <span class="chip-sub">Roma · Restaurante</span>
-      </button>
-    </div>
+
     <button class="btn-go" onclick="startExperience()">Entrar en la situación →</button>
-    <div id="recent-situations" style="display:none;margin-top:1rem;"></div>
+    <div id="recent-situations" style="display:none;margin-top:1.5rem;"></div>
   </div>
 
 
