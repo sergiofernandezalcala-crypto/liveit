@@ -763,7 +763,16 @@ function loadRecentSituations() {
   container.style.display = 'block';
   const label = document.createElement('div');
   label.className = 'recent-label';
-  label.textContent = 'Situaciones recientes — pulsa para repetir';
+  label.textContent = 'Situaciones recientes';
+  label.style.cssText = 'display:flex;justify-content:space-between;align-items:center;';
+  const clearBtn = document.createElement('button');
+  clearBtn.textContent = 'Borrar';
+  clearBtn.style.cssText = 'font-size:0.65rem;background:none;border:none;color:var(--ink3);cursor:pointer;text-decoration:underline;font-family:var(--sans);';
+  clearBtn.onclick = function() {
+    localStorage.removeItem('liveit_recent');
+    loadRecentSituations();
+  };
+  label.appendChild(clearBtn);
   container.appendChild(label);
   recent.forEach(function(s) {
     const chip = document.createElement('div');
