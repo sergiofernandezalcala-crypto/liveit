@@ -13,14 +13,13 @@ export default async function handler(req, res) {
     const { receivedMessage, relation, goal, userStyle, history } = req.body;
 
     const prompt = `Eres un asistente que ayuda a responder mensajes difíciles o delicados.
-El usuario ha recibido un mensaje y necesita ayuda para responder bien.
-Genera 3 respuestas posibles, cada una con un tono distinto pero todas naturales, humanas y adecuadas.
+Genera 3 respuestas posibles, cada una con un tono distinto, naturales y humanas.
 
 Reglas:
 - Escribe como si fuera el propio usuario, no como una IA
 - Sin florituras ni formalidades
-- Respuestas que parezcan escritas desde el móvil, en el momento
-- NUNCA: consejos de relación, juicios, frases de terapeuta, "entiendo cómo te sientes"
+- Respuestas cortas, que parezcan escritas desde el móvil
+- NUNCA: consejos de relación, juicios, frases de terapeuta
 - Tono: cálido y humano, ligeramente mejor que el usuario sin pasarse
 ${userStyle ? `- Estilo del usuario: ${userStyle}` : ''}
 ${history && history.length > 0 ? `- Contexto previo: ${history.map(h => `con ${h.relation}: "${h.snippet}"`).join(', ')}` : ''}
@@ -29,16 +28,8 @@ Mensaje recibido: "${receivedMessage}"
 Relación: ${relation}
 Objetivo: ${goal}
 
-Responde ÚNICAMENTE con este JSON exacto, sin markdown, sin explicaciones:
-{
-  "reply1": "...",
-  "reply2": "...",
-  "reply3": "...",
-  "tone1": "...",
-  "tone2": "...",
-  "tone3": "...",
-  "situation_read": "..."
-}`;
+Responde ÚNICAMENTE con JSON válido, sin markdown, sin texto antes ni después:
+{"reply1":"...","reply2":"...","reply3":"...","tone1":"...","tone2":"...","tone3":"...","situation_read":"..."}`;
 
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
@@ -49,22 +40,30 @@ Responde ÚNICAMENTE con este JSON exacto, sin markdown, sin explicaciones:
           contents: [{ parts: [{ text: prompt }] }],
           generationConfig: {
             temperature: 0.8,
-            maxOutputTokens: 800
+            maxOutputTokens: 1000,
+            responseMimeType: 'application/json'
           }
         })
       }
     );
 
     const data = await response.json();
-    if (!response.ok) return res.status(response.status).json(data);
+
+    if (!response.ok) {
+      console.error('Gemini error:', JSON.stringify(data));
+      return res.status(response.status).json({ error: 'Gemini error', detail: data });
+    }
 
     const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    if (!text) return res.status(500).json({ error: 'Empty response from Gemini' });
+
     const clean = text.replace(/```json|```/g, '').trim();
     const replies = JSON.parse(clean);
 
     return res.status(200).json({ replies });
 
   } catch (err) {
+    console.error('Handler error:', err.message);
     return res.status(502).json({ error: 'Error', detail: err.message });
   }
 }
