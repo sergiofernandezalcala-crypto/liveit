@@ -1296,91 +1296,73 @@ function scrollBubbles() {
    TTS
 ══════════════════════════════ */
 
-async function speak(text, btn) {
 
-  const orig =
-    btn.textContent;
+async function speak(text, btn) {
+  const orig = btn.textContent;
 
   btn.textContent = '⏳';
-
   btn.disabled = true;
 
+  // Limpiar pausas exageradas SOLO para la voz.
+  // El texto de la burbuja no cambia.
+  const voiceText = String(text)
+    .replace(/\.{2,}/g, ',')
+    .replace(/…+/g, ',')
+    .replace(/\s*[—–]\s*/g, ', ')
+    .replace(/\n+/g, ' ')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+
   try {
+    const resp = await fetch('/api/tts', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        text: voiceText
+      })
+    });
 
-    const resp =
-      await fetch('/api/tts', {
-
-        method: 'POST',
-
-        headers: {
-          'Content-Type': 'application/json'
-        },
-
-        body: JSON.stringify({
-          text: text
-        })
-
-      });
-
-    const data =
-      await resp.json();
+    const data = await resp.json();
 
     if (!data.audioContent) {
       throw new Error('No audio');
     }
 
-    const audio =
-      new Audio(
-        'data:audio/mp3;base64,' +
-        data.audioContent
-      );
+    const audio = new Audio(
+      'data:audio/mp3;base64,' + data.audioContent
+    );
 
     btn.textContent = '⏹';
 
     audio.onended = () => {
-
       btn.textContent = orig;
-
       btn.disabled = false;
-
     };
 
     audio.onerror = () => {
-
       btn.textContent = orig;
-
       btn.disabled = false;
-
     };
 
     await audio.play();
 
     btn.onclick = () => {
-
       audio.pause();
-
       audio.currentTime = 0;
-
       btn.textContent = orig;
-
       btn.disabled = false;
-
     };
 
   } catch (err) {
-
-    console.error(
-      'TTS error:',
-      err
-    );
+    console.error('TTS error:', err);
 
     btn.textContent = orig;
-
     btn.disabled = false;
-
   }
-
 }
+
 
 
 /* ══════════════════════════════
