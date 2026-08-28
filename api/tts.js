@@ -54,17 +54,17 @@ export default async function handler(req, res) {
             text: voiceText
           },
 
-       voice: {
+     voice: {
   languageCode: 'es-ES',
   name: 'es-ES-Neural2-B',
-  ssmlGender: 'MALE'
+  ssmlGender: 'NEUTRAL'
 },
 
           audioConfig: {
-            audioEncoding: 'MP3',
-            speakingRate: 0.90,
-            pitch: 0
-          }
+  audioEncoding: 'MP3',
+  speakingRate: 0.88,
+  pitch: -1
+}
         })
       }
     );
