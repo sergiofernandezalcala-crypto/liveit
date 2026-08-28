@@ -645,17 +645,30 @@ function scrollBubbles() {
   setTimeout(() => { el.scrollTop = el.scrollHeight; }, 50);
 }
 
-// ── TTS ──
-function speak(text, btn) {
-  if (!('speechSynthesis' in window)) return;
-  window.speechSynthesis.cancel();
-  const utt = new SpeechSynthesisUtterance(text);
-  utt.lang = 'es-ES';
-  utt.rate = 0.95;
+// ── TTS (Google) ──
+async function speak(text, btn) {
   const orig = btn.textContent;
-  btn.textContent = '⏹';
-  utt.onend = () => { btn.textContent = orig; };
-  window.speechSynthesis.speak(utt);
+  btn.textContent = '⏳';
+  btn.disabled = true;
+  try {
+    const resp = await fetch('/api/tts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text })
+    });
+    const data = await resp.json();
+    if (!data.audioContent) throw new Error('No audio');
+    const audio = new Audio('data:audio/mp3;base64,' + data.audioContent);
+    btn.textContent = '⏹';
+    audio.onended = () => { btn.textContent = orig; btn.disabled = false; };
+    audio.onerror = () => { btn.textContent = orig; btn.disabled = false; };
+    audio.play();
+    btn.onclick = () => { audio.pause(); audio.currentTime = 0; btn.textContent = orig; btn.disabled = false; };
+  } catch (err) {
+    console.error('TTS error:', err);
+    btn.textContent = orig;
+    btn.disabled = false;
+  }
 }
 
 // ── COPY ──
