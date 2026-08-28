@@ -1,19 +1,8 @@
 export default async function handler(req, res) {
 
-  res.setHeader(
-    'Access-Control-Allow-Origin',
-    '*'
-  );
-
-  res.setHeader(
-    'Access-Control-Allow-Methods',
-    'POST, OPTIONS'
-  );
-
-  res.setHeader(
-    'Access-Control-Allow-Headers',
-    'Content-Type'
-  );
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
@@ -25,8 +14,7 @@ export default async function handler(req, res) {
     });
   }
 
-  const apiKey =
-    process.env.GEMINI_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY;
 
   if (!apiKey) {
     return res.status(500).json({
@@ -57,10 +45,7 @@ export default async function handler(req, res) {
       });
     }
 
-    if (
-      !Array.isArray(messages) ||
-      messages.length === 0
-    ) {
+    if (!Array.isArray(messages) || messages.length === 0) {
       return res.status(400).json({
         error: 'Missing messages'
       });
@@ -68,23 +53,20 @@ export default async function handler(req, res) {
 
     // ── CONVERSACIÓN ──
 
-    const conversation =
-      messages
-        .map(m => {
+    const conversation = messages
+      .map(m => {
+        const who =
+          m.role === 'mine'
+            ? 'USUARIO'
+            : 'OTRA PERSONA';
 
-          const who =
-            m.role === 'mine'
-              ? 'USUARIO'
-              : 'OTRA PERSONA';
+        return `${who}: ${m.text}`;
+      })
+      .join('\n');
 
-          return `${who}: ${m.text}`;
+    // ── INSTRUCCIONES ──
 
-        })
-        .join('\n');
-
-    // ── PROMPT ──
-
-    const prompt = `
+    const instructions = `
 Eres eablo, un asistente que ayuda al usuario
 a responder mensajes difíciles o delicados.
 
@@ -103,7 +85,6 @@ OBJETIVO:
 ${goal}
 
 CONVERSACIÓN COMPLETA:
-
 ${conversation}
 
 REGLAS:
@@ -116,19 +97,19 @@ REGLAS:
 - Sin formalidades.
 - Sin lenguaje de terapeuta.
 - Sin consejos de relación.
-- Sin frases tipo "entiendo cómo te sientes".
-- No hagas una respuesta excesivamente perfecta.
+- No uses frases artificiales como:
+  "entiendo cómo te sientes".
+- No hagas respuestas excesivamente perfectas.
 - No hagas las tres respuestas casi iguales.
 - Las tres deben poder enviarse realmente.
 - Ten en cuenta toda la conversación anterior.
-- No trates el último mensaje como si fuera una
-  conversación aislada.
+- No trates el último mensaje como una conversación aislada.
 - No repitas simplemente las palabras de la otra persona.
 - Haz avanzar la conversación.
 - Respeta el objetivo indicado.
-- No inventes hechos que no aparecen en la conversación.
+- No inventes hechos.
 
-Genera exactamente tres respuestas:
+Genera exactamente tres respuestas.
 
 reply1:
 La opción más natural y equilibrada.
@@ -139,86 +120,73 @@ Una opción algo más cercana o cálida.
 reply3:
 Una opción algo más directa o firme.
 
-Los campos tone1, tone2 y tone3 deben ser etiquetas
-MUY cortas, por ejemplo:
-"Natural"
-"Cercana"
-"Directa"
+tone1, tone2 y tone3:
+Etiquetas muy cortas como "Natural", "Cercana" o "Directa".
 
-situation_read debe ser una descripción interna
-muy breve de lo que está ocurriendo en la conversación.
-NO debe ser un consejo.
+situation_read:
+Descripción interna muy breve de lo que está ocurriendo.
+NO es un consejo.
 
-${userStyle
-  ? `ESTILO DEL USUARIO:
-${userStyle}`
-  : ''}
+${userStyle ? `
+ESTILO DEL USUARIO:
+${userStyle}
+` : ''}
 `;
 
-    // ── GEMINI ──
+    // ── INTERACTIONS API ──
 
-  const response = await fetch(
-  `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`,
-  {
+    const response = await fetch(
+      'https://generativelanguage.googleapis.com/v1beta/interactions',
+      {
         method: 'POST',
 
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'x-goog-api-key': apiKey
         },
 
         body: JSON.stringify({
 
-          contents: [
-            {
-              parts: [
-                {
-                  text: prompt
-                }
-              ]
-            }
-          ],
+          model: 'gemini-3.6-flash',
 
-          generationConfig: {
+          system_instruction: instructions,
 
-            maxOutputTokens: 1000,
+          input: conversation,
 
-            response_mime_type:
-              'application/json',
+          generation_config: {
+            response_mime_type: 'application/json',
 
             response_schema: {
-
-              type: 'OBJECT',
+              type: 'object',
 
               properties: {
-
                 reply1: {
-                  type: 'STRING'
+                  type: 'string'
                 },
 
                 reply2: {
-                  type: 'STRING'
+                  type: 'string'
                 },
 
                 reply3: {
-                  type: 'STRING'
+                  type: 'string'
                 },
 
                 tone1: {
-                  type: 'STRING'
+                  type: 'string'
                 },
 
                 tone2: {
-                  type: 'STRING'
+                  type: 'string'
                 },
 
                 tone3: {
-                  type: 'STRING'
+                  type: 'string'
                 },
 
                 situation_read: {
-                  type: 'STRING'
+                  type: 'string'
                 }
-
               },
 
               required: [
@@ -230,41 +198,41 @@ ${userStyle}`
                 'tone3',
                 'situation_read'
               ]
-
             }
-
           }
 
         })
       }
     );
 
-    // ── RESPUESTA GOOGLE ──
+    // ── RESPUESTA DE GEMINI ──
 
-    const data =
-      await response.json();
+    const data = await response.json();
 
     if (!response.ok) {
 
-      console.error(
-        'Gemini error:',
-        data
-      );
+      console.error('Gemini error:', data);
 
-      return res.status(
-        response.status
-      ).json({
+      return res.status(response.status).json({
         error: 'Gemini error',
         detail: data
       });
     }
 
+    // Interactions API devuelve el texto generado
+    // dentro de output.
+    const output = Array.isArray(data.output)
+      ? data.output
+      : [];
+
+    const messageOutput = output.find(
+      item => item.type === 'message'
+    );
+
     const text =
-      data
-        .candidates?.[0]
-        ?.content
-        ?.parts?.[0]
-        ?.text || '';
+      messageOutput?.content?.find(
+        item => item.type === 'text'
+      )?.text || '';
 
     if (!text) {
 
@@ -274,19 +242,16 @@ ${userStyle}`
       );
 
       return res.status(500).json({
-        error:
-          'Empty response from Gemini'
+        error: 'Empty response from Gemini'
       });
     }
 
-    // ── PARSE JSON ──
+    // ── JSON ──
 
     let replies;
 
     try {
-
       replies = JSON.parse(text);
-
     } catch (err) {
 
       console.error(
@@ -295,8 +260,8 @@ ${userStyle}`
       );
 
       return res.status(502).json({
-        error:
-          'Invalid JSON returned by Gemini'
+        error: 'Invalid JSON returned by Gemini',
+        raw: text
       });
     }
 
