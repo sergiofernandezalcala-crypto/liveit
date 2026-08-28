@@ -55,91 +55,76 @@ export default async function handler(req, res) {
     // ── CONVERSACIÓN ──
 
     const conversation = messages
-      .map(m => {
+      .map(function(m) {
 
         const who =
           m.role === 'mine'
             ? 'USUARIO'
             : 'OTRA PERSONA';
 
-        return `${who}: ${m.text}`;
+        return who + ': ' + m.text;
 
       })
       .join('\n');
 
     // ── INSTRUCCIONES ──
 
-    const instructions = `
-Eres eablo, un asistente que ayuda al usuario
-a responder mensajes difíciles o delicados.
+    const instructions =
+      'Eres eablo, un asistente que ayuda al usuario ' +
+      'a responder mensajes difíciles o delicados.\n\n' +
 
-Tu trabajo es proponer respuestas que el usuario
-pueda enviar directamente.
+      'Tu trabajo es proponer respuestas que el usuario ' +
+      'pueda enviar directamente.\n\n' +
 
-NO eres terapeuta.
-NO das consejos.
-NO juzgas.
-NO explicas qué debería hacer el usuario.
+      'NO eres terapeuta.\n' +
+      'NO das consejos.\n' +
+      'NO juzgas.\n' +
+      'NO explicas qué debería hacer el usuario.\n\n' +
 
-RELACIÓN:
-${relation}
+      'RELACIÓN:\n' +
+      relation + '\n\n' +
 
-OBJETIVO:
-${goal}
+      'OBJETIVO:\n' +
+      goal + '\n\n' +
 
-CONVERSACIÓN COMPLETA:
+      'CONVERSACIÓN COMPLETA:\n\n' +
+      conversation + '\n\n' +
 
-${conversation}
+      'REGLAS:\n\n' +
 
-REGLAS:
+      '- Escribe como si las respuestas las hubiera escrito el propio usuario.\n' +
+      '- Deben sonar naturales y humanas.\n' +
+      '- Deben parecer escritas desde el móvil.\n' +
+      '- Sin florituras.\n' +
+      '- Sin formalidades.\n' +
+      '- Sin lenguaje de terapeuta.\n' +
+      '- Sin consejos de relación.\n' +
+      '- No uses frases artificiales como "entiendo cómo te sientes".\n' +
+      '- No hagas respuestas excesivamente perfectas.\n' +
+      '- No hagas las tres respuestas casi iguales.\n' +
+      '- Las tres deben poder enviarse realmente.\n' +
+      '- Ten en cuenta toda la conversación anterior.\n' +
+      '- No trates el último mensaje como una conversación aislada.\n' +
+      '- No repitas simplemente las palabras de la otra persona.\n' +
+      '- Haz avanzar la conversación.\n' +
+      '- Respeta el objetivo indicado.\n' +
+      '- No inventes hechos.\n\n' +
 
-- Escribe como si las respuestas las hubiera escrito
-  el propio usuario.
-- Deben sonar naturales y humanas.
-- Deben parecer escritas desde el móvil.
-- Sin florituras.
-- Sin formalidades.
-- Sin lenguaje de terapeuta.
-- Sin consejos de relación.
-- No uses frases artificiales como:
-  "entiendo cómo te sientes".
-- No hagas respuestas excesivamente perfectas.
-- No hagas las tres respuestas casi iguales.
-- Las tres deben poder enviarse realmente.
-- Ten en cuenta toda la conversación anterior.
-- No trates el último mensaje como si fuera una
-  conversación aislada.
-- No repitas simplemente las palabras de la otra persona.
-- Haz avanzar la conversación.
-- Respeta el objetivo indicado.
-- No inventes hechos.
+      'Genera exactamente tres respuestas.\n\n' +
 
-Genera exactamente tres respuestas.
+      'reply1: La opción más natural y equilibrada.\n' +
+      'reply2: Una opción algo más cercana o cálida.\n' +
+      'reply3: Una opción algo más directa o firme.\n\n' +
 
-reply1:
-La opción más natural y equilibrada.
+      'tone1, tone2 y tone3: etiquetas muy cortas como "Natural", "Cercana" o "Directa".\n\n' +
 
-reply2:
-Una opción algo más cercana o cálida.
+      'situation_read: descripción interna muy breve de lo que está ocurriendo. NO es un consejo.\n\n' +
 
-reply3:
-Una opción algo más directa o firme.
+      (userStyle
+        ? 'ESTILO DEL USUARIO:\n' + userStyle + '\n\n'
+        : '') +
 
-tone1, tone2 y tone3:
-Etiquetas muy cortas como "Natural", "Cercana" o "Directa".
-
-situation_read:
-Descripción interna muy breve de lo que está ocurriendo.
-NO es un consejo.
-
-${userStyle ? `
-ESTILO DEL USUARIO:
-${userStyle}
-` : ''}
-
-Devuelve únicamente un objeto JSON válido con estos campos:
-reply1, reply2, reply3, tone1, tone2, tone3, situation_read.
-`;
+      'Devuelve únicamente el objeto JSON solicitado.';
 
     // ── INTERACTIONS API ──
 
@@ -166,10 +151,13 @@ reply1, reply2, reply3, tone1, tone2, tone3, situation_read.
           },
 
           response_format: {
+
             type: 'text',
+
             mime_type: 'application/json',
 
             schema: {
+
               type: 'object',
 
               properties: {
@@ -213,7 +201,9 @@ reply1, reply2, reply3, tone1, tone2, tone3, situation_read.
                 'tone3',
                 'situation_read'
               ]
+
             }
+
           }
 
         })
@@ -237,20 +227,28 @@ reply1, reply2, reply3, tone1, tone2, tone3, situation_read.
       });
     }
 
-    // ── EXTRAER TEXTO DE INTERACTIONS API ──
+    // ── EXTRAER TEXTO ──
 
     const steps = Array.isArray(data.steps)
       ? data.steps
       : [];
 
-    const modelOutput = [...steps]
+    const modelOutput = steps
+      .slice()
       .reverse()
-      .find(step => step.type === 'model_output');
+      .find(function(step) {
+        return step.type === 'model_output';
+      });
 
     const text =
-      modelOutput?.content?.find(
-        item => item.type === 'text'
-      )?.text || '';
+      modelOutput &&
+      Array.isArray(modelOutput.content)
+        ? (
+            modelOutput.content.find(function(item) {
+              return item.type === 'text';
+            }) || {}
+          ).text || ''
+        : '';
 
     if (!text) {
 
@@ -288,7 +286,7 @@ reply1, reply2, reply3, tone1, tone2, tone3, situation_read.
     // ── RESPUESTA AL FRONTEND ──
 
     return res.status(200).json({
-      replies
+      replies: replies
     });
 
   } catch (err) {
