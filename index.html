@@ -32,28 +32,34 @@ body {
   flex-direction: column;
 }
 
+/* ── HEADER ── */
 header {
-  padding: 1.2rem 1.5rem 0.8rem;
+  padding: 2.5rem 1.5rem 1.5rem;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
+  text-align: center;
 }
 
 .wordmark {
   font-family: var(--brand);
-  font-size: 1.6rem;
+  font-size: clamp(2.8rem, 10vw, 4.5rem);
   font-weight: 300;
+  line-height: 1;
   letter-spacing: -0.01em;
   color: var(--ink);
 }
 .wordmark span { color: var(--green); }
 
 .header-hint {
-  font-size: 0.75rem;
-  color: var(--ink3);
+  margin-top: 0.5rem;
+  font-size: 1.05rem;
+  color: #444;
+  letter-spacing: 0.02em;
   font-style: italic;
 }
 
+/* ── MAIN ── */
 main {
   flex: 1;
   padding: 0.5rem 1.5rem 2rem;
@@ -65,24 +71,19 @@ main {
   gap: 1.2rem;
 }
 
+/* ── PRIVACY NOTICE ── */
 #privacy-notice {
-  background: #f0faf5;
-  border: 1px solid #b2dfcc;
-  border-radius: var(--r);
-  padding: 0.9rem 1rem;
   display: flex;
   align-items: flex-start;
-  gap: 0.6rem;
+  gap: 0.5rem;
+  padding: 0.6rem 0;
+  border-top: 1px solid var(--border);
+  margin-top: 0.5rem;
 }
-#privacy-notice.hidden { display: none; }
-.privacy-icon { font-size: 1rem; flex-shrink: 0; margin-top: 0.05rem; }
-.privacy-text { font-size: 0.8rem; color: #2e7d5e; line-height: 1.5; flex: 1; }
-.privacy-close {
-  background: none; border: none; cursor: pointer;
-  color: #2e7d5e; font-size: 1rem; flex-shrink: 0;
-  padding: 0; line-height: 1;
-}
+.privacy-icon { font-size: 0.85rem; flex-shrink: 0; margin-top: 0.1rem; }
+.privacy-text { font-size: 0.75rem; color: var(--ink3); line-height: 1.5; }
 
+/* ── SECTION LABELS ── */
 .section-label {
   font-size: 0.7rem;
   font-weight: 600;
@@ -92,6 +93,7 @@ main {
   margin-bottom: 0.4rem;
 }
 
+/* ── MESSAGE INPUT ── */
 .input-block { display: flex; flex-direction: column; }
 
 textarea#msg {
@@ -112,6 +114,7 @@ textarea#msg {
 textarea#msg:focus { outline: none; border-color: var(--ink); }
 textarea#msg::placeholder { color: var(--ink3); }
 
+/* ── QUICK OPTIONS ── */
 .options-row {
   display: flex;
   gap: 0.5rem;
@@ -138,6 +141,7 @@ textarea#msg::placeholder { color: var(--ink3); }
   font-weight: 600;
 }
 
+/* ── GO BUTTON ── */
 #btn-go {
   width: 100%;
   background: var(--green);
@@ -155,6 +159,7 @@ textarea#msg::placeholder { color: var(--ink3); }
 #btn-go:active { transform: scale(0.98); }
 #btn-go:disabled { opacity: 0.4; cursor: not-allowed; }
 
+/* ── LOADING ── */
 #loading {
   display: none;
   flex-direction: column;
@@ -178,6 +183,7 @@ textarea#msg::placeholder { color: var(--ink3); }
 }
 .loading-text { font-size: 0.85rem; color: var(--ink3); font-style: italic; }
 
+/* ── SITUATION READ ── */
 #situation-read {
   display: none;
   background: var(--white);
@@ -191,6 +197,7 @@ textarea#msg::placeholder { color: var(--ink3); }
 }
 #situation-read.visible { display: block; }
 
+/* ── REPLIES ── */
 #replies { display: none; flex-direction: column; gap: 0.75rem; }
 #replies.visible { display: flex; }
 
@@ -230,6 +237,7 @@ textarea#msg::placeholder { color: var(--ink3); }
 .reply-card:hover .reply-copy { opacity: 0.7; }
 .reply-copy.copied { opacity: 1; }
 
+/* ── FEEDBACK ── */
 .feedback-row {
   display: flex;
   gap: 0.5rem;
@@ -243,6 +251,7 @@ textarea#msg::placeholder { color: var(--ink3); }
 }
 .fb-btn:hover { color: var(--ink); }
 
+/* ── NEW BUTTON ── */
 #btn-new {
   display: none;
   width: 100%;
@@ -260,6 +269,7 @@ textarea#msg::placeholder { color: var(--ink3); }
 #btn-new:hover { border-color: var(--ink2); color: var(--ink); }
 #btn-new.visible { display: block; }
 
+/* ── HISTORY ── */
 #history-block { display: flex; flex-direction: column; }
 .history-list { display: flex; flex-direction: column; gap: 0.4rem; }
 
@@ -277,12 +287,16 @@ textarea#msg::placeholder { color: var(--ink3); }
 .history-item:hover { border-color: #ccc; }
 
 .history-info { flex: 1; min-width: 0; }
-.history-relation { font-size: 0.8rem; font-weight: 600; color: var(--ink); }
+.history-relation {
+  font-size: 0.8rem; font-weight: 600; color: var(--ink);
+}
 .history-snippet {
   font-size: 0.75rem; color: var(--ink3);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.history-time { font-size: 0.7rem; color: var(--ink3); white-space: nowrap; }
+.history-time {
+  font-size: 0.7rem; color: var(--ink3); white-space: nowrap;
+}
 .history-delete {
   background: none; border: none; cursor: pointer;
   font-size: 1rem; color: var(--ink3);
@@ -290,6 +304,7 @@ textarea#msg::placeholder { color: var(--ink3); }
   flex-shrink: 0;
 }
 .history-delete:hover { color: #e53935; }
+
 .history-empty {
   font-size: 0.8rem; color: var(--ink3); font-style: italic;
   padding: 0.4rem 0;
@@ -305,17 +320,7 @@ textarea#msg::placeholder { color: var(--ink3); }
 
 <main>
 
-  <div id="privacy-notice">
-    <span class="privacy-icon">🔒</span>
-    <span class="privacy-text">Las últimas 3 conversaciones se guardan <strong>solo en este dispositivo</strong> para darte mejor contexto. Nunca salen de aquí.</span>
-    <button class="privacy-close" onclick="dismissPrivacy()">✕</button>
-  </div>
-
-  <div class="input-block">
-    <div class="section-label">Mensaje recibido</div>
-    <textarea id="msg" placeholder="Pega aquí lo que te han escrito…" rows="5"></textarea>
-  </div>
-
+  <!-- RELATION -->
   <div>
     <div class="section-label">¿Quién te escribe?</div>
     <div class="options-row" id="relation-pills">
@@ -327,6 +332,13 @@ textarea#msg::placeholder { color: var(--ink3); }
     </div>
   </div>
 
+  <!-- MESSAGE -->
+  <div class="input-block">
+    <div class="section-label">Mensaje recibido</div>
+    <textarea id="msg" placeholder="Pega aquí lo que te han escrito…" rows="5"></textarea>
+  </div>
+
+  <!-- GOAL -->
   <div>
     <div class="section-label">¿Qué quieres conseguir?</div>
     <div class="options-row" id="goal-pills">
@@ -338,21 +350,34 @@ textarea#msg::placeholder { color: var(--ink3); }
     </div>
   </div>
 
+  <!-- GO -->
   <button id="btn-go" onclick="generate()">Ayúdame a responder</button>
 
+  <!-- LOADING -->
   <div id="loading">
     <div class="dots"><span></span><span></span><span></span></div>
     <div class="loading-text">Leyendo la situación…</div>
   </div>
 
+  <!-- SITUATION READ -->
   <div id="situation-read"></div>
+
+  <!-- REPLIES -->
   <div id="replies"></div>
 
+  <!-- NEW -->
   <button id="btn-new" onclick="resetForm()">← Nueva consulta</button>
 
+  <!-- HISTORY -->
   <div id="history-block">
     <div class="section-label">Conversaciones recientes</div>
     <div class="history-list" id="history-list"></div>
+  </div>
+
+  <!-- PRIVACY -->
+  <div id="privacy-notice">
+    <span class="privacy-icon">🔒</span>
+    <span class="privacy-text">Las últimas 3 conversaciones se guardan <strong>solo en este dispositivo</strong> para darte mejor contexto. Nunca salen de aquí.</span>
   </div>
 
 </main>
@@ -360,17 +385,13 @@ textarea#msg::placeholder { color: var(--ink3); }
 <script>
 const STORAGE_KEY = 'eablo_history';
 const MAX_HISTORY = 3;
+
 let selectedRelation = '';
 let selectedGoal = '';
 
-function dismissPrivacy() {
-  document.getElementById('privacy-notice').classList.add('hidden');
-  localStorage.setItem('eablo_privacy_ok', '1');
-}
-if (localStorage.getItem('eablo_privacy_ok')) {
-  document.getElementById('privacy-notice').classList.add('hidden');
-}
+// ── PRIVACY ──
 
+// ── PILLS ──
 document.querySelectorAll('#relation-pills .pill').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('#relation-pills .pill').forEach(b => b.classList.remove('active'));
@@ -387,41 +408,47 @@ document.querySelectorAll('#goal-pills .pill').forEach(btn => {
   });
 });
 
+// ── HISTORY ──
 function getHistory() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
   catch { return []; }
 }
-function saveHistory(h) { localStorage.setItem(STORAGE_KEY, JSON.stringify(h)); }
-
+function saveHistory(history) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+}
 function addToHistory(relation, snippet, message) {
-  const h = getHistory();
-  h.unshift({ id: Date.now(), relation, snippet, message, ts: Date.now() });
-  if (h.length > MAX_HISTORY) h.splice(MAX_HISTORY);
-  saveHistory(h);
+  const history = getHistory();
+  history.unshift({ id: Date.now(), relation, snippet, message, ts: Date.now() });
+  if (history.length > MAX_HISTORY) history.splice(MAX_HISTORY);
+  saveHistory(history);
   renderHistory();
 }
 function deleteHistoryItem(id) {
-  saveHistory(getHistory().filter(h => h.id !== id));
+  const history = getHistory().filter(h => h.id !== id);
+  saveHistory(history);
   renderHistory();
 }
 function timeAgo(ts) {
-  const d = (Date.now() - ts) / 1000;
-  if (d < 3600) return `hace ${Math.round(d/60)}m`;
-  if (d < 86400) return `hace ${Math.round(d/3600)}h`;
-  return `hace ${Math.round(d/86400)}d`;
+  const diff = (Date.now() - ts) / 1000;
+  if (diff < 3600) return `hace ${Math.round(diff/60)}m`;
+  if (diff < 86400) return `hace ${Math.round(diff/3600)}h`;
+  return `hace ${Math.round(diff/86400)}d`;
 }
 function renderHistory() {
   const list = document.getElementById('history-list');
-  const h = getHistory();
-  if (!h.length) { list.innerHTML = '<div class="history-empty">Sin conversaciones recientes</div>'; return; }
-  list.innerHTML = h.map(item => `
-    <div class="history-item" onclick="loadHistory(${item.id})">
+  const history = getHistory();
+  if (history.length === 0) {
+    list.innerHTML = '<div class="history-empty">Sin conversaciones recientes</div>';
+    return;
+  }
+  list.innerHTML = history.map(h => `
+    <div class="history-item" onclick="loadHistory(${h.id})">
       <div class="history-info">
-        <div class="history-relation">${item.relation}</div>
-        <div class="history-snippet">${item.snippet}</div>
+        <div class="history-relation">${h.relation}</div>
+        <div class="history-snippet">${h.snippet}</div>
       </div>
-      <div class="history-time">${timeAgo(item.ts)}</div>
-      <button class="history-delete" onclick="event.stopPropagation();deleteHistoryItem(${item.id})" title="Eliminar">🗑</button>
+      <div class="history-time">${timeAgo(h.ts)}</div>
+      <button class="history-delete" onclick="event.stopPropagation(); deleteHistoryItem(${h.id})" title="Eliminar">🗑</button>
     </div>
   `).join('');
 }
@@ -429,6 +456,7 @@ function loadHistory(id) {
   const item = getHistory().find(h => h.id === id);
   if (!item) return;
   document.getElementById('msg').value = item.message;
+  // Pre-select relation pill if matches
   document.querySelectorAll('#relation-pills .pill').forEach(b => {
     b.classList.toggle('active', b.dataset.val === item.relation);
     if (b.dataset.val === item.relation) selectedRelation = item.relation;
@@ -436,17 +464,21 @@ function loadHistory(id) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
+// ── GENERATE ──
 async function generate() {
   const msg = document.getElementById('msg').value.trim();
   if (!msg) { alert('Pega el mensaje que recibiste.'); return; }
   if (!selectedRelation) { alert('¿Quién te escribe?'); return; }
   if (!selectedGoal) { alert('¿Qué quieres conseguir?'); return; }
 
+  // UI: loading
   document.getElementById('btn-go').disabled = true;
   document.getElementById('loading').classList.add('visible');
   document.getElementById('situation-read').classList.remove('visible');
   document.getElementById('replies').classList.remove('visible');
   document.getElementById('btn-new').classList.remove('visible');
+
+  const history = getHistory().map(h => ({ relation: h.relation, snippet: h.snippet }));
 
   try {
     const resp = await fetch('/api/chat', {
@@ -456,17 +488,20 @@ async function generate() {
         receivedMessage: msg,
         relation: selectedRelation,
         goal: selectedGoal,
-        history: getHistory().map(h => ({ relation: h.relation, snippet: h.snippet }))
+        history
       })
     });
     const data = await resp.json();
     if (!resp.ok) throw new Error(data.error || 'Error');
 
     const r = data.replies;
+
+    // Situation read
     const sr = document.getElementById('situation-read');
     sr.textContent = r.situation_read;
     sr.classList.add('visible');
 
+    // Replies
     const repliesEl = document.getElementById('replies');
     repliesEl.innerHTML = [
       { text: r.reply1, tone: r.tone1 },
@@ -476,16 +511,19 @@ async function generate() {
       <div class="reply-card">
         <div class="reply-tone">${rep.tone}</div>
         <div class="reply-text">${rep.text}</div>
-        <button class="reply-copy" onclick="copyReply(this, ${JSON.stringify(rep.text)})" title="Copiar">📋</button>
+        <button class="reply-copy" onclick="copyReply(this, '${rep.text.replace(/'/g, "\\'")}')" title="Copiar">📋</button>
         <div class="feedback-row">
-          <button class="fb-btn" onclick="feedback(${i},'good')">👍 Así hablaría</button>
-          <button class="fb-btn" onclick="feedback(${i},'bad')">👎 No es mi estilo</button>
+          <button class="fb-btn" onclick="feedback(${i}, 'good')">👍 Así hablaría</button>
+          <button class="fb-btn" onclick="feedback(${i}, 'bad')">👎 No es mi estilo</button>
         </div>
       </div>
     `).join('');
     repliesEl.classList.add('visible');
 
-    addToHistory(selectedRelation, msg.length > 50 ? msg.slice(0,50)+'…' : msg, msg);
+    // Save to history
+    const snippet = msg.length > 50 ? msg.slice(0, 50) + '…' : msg;
+    addToHistory(selectedRelation, snippet, msg);
+
     document.getElementById('btn-new').classList.add('visible');
 
   } catch (err) {
@@ -500,25 +538,32 @@ async function generate() {
 function copyReply(btn, text) {
   navigator.clipboard.writeText(text).then(() => {
     btn.textContent = '✅';
-    setTimeout(() => { btn.textContent = '📋'; }, 1500);
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '📋'; btn.classList.remove('copied'); }, 1500);
   });
 }
 
 function feedback(index, type) {
-  const row = document.querySelectorAll('.reply-card')[index]?.querySelector('.feedback-row');
-  if (row) row.innerHTML = `<span style="font-size:0.75rem;color:var(--ink3)">${type==='good'?'✓ Guardado':'✓ Anotado'}</span>`;
+  // Store feedback for future learning (placeholder)
+  console.log('Feedback:', index, type);
+  // Visual confirmation
+  const cards = document.querySelectorAll('.reply-card');
+  const row = cards[index]?.querySelector('.feedback-row');
+  if (row) row.innerHTML = `<span style="font-size:0.75rem;color:var(--ink3)">${type === 'good' ? '✓ Guardado' : '✓ Anotado'}</span>`;
 }
 
 function resetForm() {
   document.getElementById('msg').value = '';
   document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
-  selectedRelation = ''; selectedGoal = '';
+  selectedRelation = '';
+  selectedGoal = '';
   document.getElementById('situation-read').classList.remove('visible');
   document.getElementById('replies').classList.remove('visible');
   document.getElementById('btn-new').classList.remove('visible');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
+// Init
 renderHistory();
 </script>
 </body>
