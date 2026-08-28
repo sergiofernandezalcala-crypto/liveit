@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>eablo</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Comfortaa:wght@300&display=swap');
@@ -23,46 +23,53 @@
   --brand:   'Comfortaa', var(--sans);
 }
 
+html, body { height: 100%; overflow: hidden; }
+
 body {
   background: var(--paper);
   color: var(--ink);
   font-family: var(--sans);
-  min-height: 100dvh;
   display: flex;
   flex-direction: column;
 }
 
-/* ── HEADER ── */
+/* ══════════════════════════════
+   PANTALLA 1 — HOME
+══════════════════════════════ */
+#screen-home {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 header {
-  padding: 2.5rem 1.5rem 1.5rem;
+  padding: 2.5rem 1.5rem 1.2rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
+  flex-shrink: 0;
 }
-
 .wordmark {
   font-family: var(--brand);
   font-size: clamp(2.8rem, 10vw, 4.5rem);
   font-weight: 300;
   line-height: 1;
   letter-spacing: -0.01em;
-  color: var(--ink);
 }
 .wordmark span { color: var(--green); }
-
 .header-hint {
   margin-top: 0.5rem;
-  font-size: 1.05rem;
-  color: #444;
-  letter-spacing: 0.02em;
+  font-size: 1rem;
+  color: #555;
   font-style: italic;
 }
 
-/* ── MAIN ── */
-main {
+.home-body {
   flex: 1;
-  padding: 0.5rem 1.5rem 2rem;
+  padding: 0.5rem 1.5rem 1.5rem;
   max-width: 520px;
   width: 100%;
   margin: 0 auto;
@@ -71,19 +78,6 @@ main {
   gap: 1.2rem;
 }
 
-/* ── PRIVACY NOTICE ── */
-#privacy-notice {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.5rem;
-  padding: 0.6rem 0;
-  border-top: 1px solid var(--border);
-  margin-top: 0.5rem;
-}
-.privacy-icon { font-size: 0.85rem; flex-shrink: 0; margin-top: 0.1rem; }
-.privacy-text { font-size: 0.75rem; color: var(--ink3); line-height: 1.5; }
-
-/* ── SECTION LABELS ── */
 .section-label {
   font-size: 0.7rem;
   font-weight: 600;
@@ -93,33 +87,7 @@ main {
   margin-bottom: 0.4rem;
 }
 
-/* ── MESSAGE INPUT ── */
-.input-block { display: flex; flex-direction: column; }
-
-textarea#msg {
-  width: 100%;
-  min-height: 120px;
-  border: 1.5px solid var(--border);
-  border-radius: var(--r);
-  padding: 0.9rem 1rem;
-  font-family: var(--sans);
-  font-size: 0.95rem;
-  color: var(--ink);
-  background: var(--white);
-  resize: none;
-  line-height: 1.55;
-  transition: border-color 0.2s;
-  -webkit-appearance: none;
-}
-textarea#msg:focus { outline: none; border-color: var(--ink); }
-textarea#msg::placeholder { color: var(--ink3); }
-
-/* ── QUICK OPTIONS ── */
-.options-row {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
+.options-row { display: flex; gap: 0.5rem; flex-wrap: wrap; }
 
 .pill {
   border: 1.5px solid var(--border);
@@ -130,10 +98,9 @@ textarea#msg::placeholder { color: var(--ink3); }
   color: var(--ink2);
   background: var(--white);
   cursor: pointer;
-  transition: border-color 0.15s, color 0.15s, background 0.15s;
+  transition: border-color 0.15s, background 0.15s;
   -webkit-appearance: none;
 }
-.pill:hover { border-color: var(--ink2); color: var(--ink); }
 .pill.active {
   border-color: var(--green);
   background: var(--green);
@@ -141,7 +108,23 @@ textarea#msg::placeholder { color: var(--ink3); }
   font-weight: 600;
 }
 
-/* ── GO BUTTON ── */
+textarea#msg {
+  width: 100%;
+  min-height: 110px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--r);
+  padding: 0.9rem 1rem;
+  font-family: var(--sans);
+  font-size: 0.95rem;
+  color: var(--ink);
+  background: var(--white);
+  resize: none;
+  line-height: 1.55;
+  -webkit-appearance: none;
+}
+textarea#msg:focus { outline: none; border-color: var(--ink); }
+textarea#msg::placeholder { color: var(--ink3); }
+
 #btn-go {
   width: 100%;
   background: var(--green);
@@ -153,140 +136,12 @@ textarea#msg::placeholder { color: var(--ink3); }
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: opacity 0.15s, transform 0.1s;
   -webkit-appearance: none;
 }
-#btn-go:active { transform: scale(0.98); }
-#btn-go:disabled { opacity: 0.4; cursor: not-allowed; }
+#btn-go:disabled { opacity: 0.4; }
 
-/* ── LOADING ── */
-#loading {
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.6rem;
-  padding: 1.5rem 0;
-}
-#loading.visible { display: flex; }
-.dots { display: flex; gap: 0.4rem; }
-.dots span {
-  width: 8px; height: 8px;
-  border-radius: 50%;
-  background: var(--green);
-  animation: bounce 1.2s infinite;
-}
-.dots span:nth-child(2) { animation-delay: 0.2s; }
-.dots span:nth-child(3) { animation-delay: 0.4s; }
-@keyframes bounce {
-  0%, 80%, 100% { transform: translateY(0); }
-  40% { transform: translateY(-8px); }
-}
-.loading-text { font-size: 0.85rem; color: var(--ink3); font-style: italic; }
-
-/* ── SITUATION READ ── */
-#situation-read {
-  display: none;
-  background: var(--white);
-  border: 1.5px solid var(--border);
-  border-radius: var(--r);
-  padding: 0.9rem 1rem;
-  font-size: 0.88rem;
-  color: var(--ink2);
-  line-height: 1.5;
-  font-style: italic;
-}
-#situation-read.visible { display: block; }
-
-/* ── REPLIES ── */
-#replies { display: none; flex-direction: column; gap: 0.75rem; }
-#replies.visible { display: flex; }
-
-.reply-card {
-  background: var(--white);
-  border: 1.5px solid var(--border);
-  border-radius: var(--r);
-  padding: 1rem;
-  transition: border-color 0.15s;
-  position: relative;
-}
-.reply-card:hover { border-color: var(--green); }
-.reply-card.chosen { border-color: var(--green); background: #f0fff8; }
-
-.reply-tone {
-  font-size: 0.68rem;
-  font-weight: 600;
-  color: var(--ink3);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  margin-bottom: 0.5rem;
-}
-.reply-textarea {
-  width: 100%;
-  border: none;
-  background: transparent;
-  font-family: var(--sans);
-  font-size: 0.95rem;
-  color: var(--ink);
-  line-height: 1.55;
-  resize: none;
-  outline: none;
-  min-height: 60px;
-  padding: 0;
-}
-
-/* ── BOTTOM ROW ── */
-.reply-actions {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 0.7rem;
-  gap: 0.5rem;
-}
-.btn-chosen {
-  background: var(--green);
-  border: none;
-  border-radius: 999px;
-  padding: 0.3rem 0.9rem;
-  font-family: var(--sans);
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--ink);
-  cursor: pointer;
-  transition: opacity 0.15s;
-  white-space: nowrap;
-}
-.btn-chosen:hover { opacity: 0.8; }
-.btn-chosen.active { background: var(--green-dk); }
-.reply-copy {
-  background: none; border: none;
-  font-size: 1rem; cursor: pointer;
-  opacity: 0.4; transition: opacity 0.15s;
-  padding: 0;
-}
-.reply-copy:hover { opacity: 0.8; }
-
-/* ── NEW BUTTON ── */
-#btn-new {
-  display: none;
-  width: 100%;
-  background: none;
-  color: var(--ink2);
-  border: 1.5px solid var(--border);
-  border-radius: var(--r);
-  padding: 0.8rem;
-  font-family: var(--sans);
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: border-color 0.15s, color 0.15s;
-  -webkit-appearance: none;
-}
-#btn-new:hover { border-color: var(--ink2); color: var(--ink); }
-#btn-new.visible { display: block; }
-
-/* ── HISTORY ── */
-#history-block { display: flex; flex-direction: column; gap: 0.4rem; margin-top: 0.5rem; }
+/* history */
 .history-list { display: flex; flex-direction: column; gap: 0.4rem; }
-
 .history-item {
   display: flex;
   align-items: center;
@@ -296,117 +151,318 @@ textarea#msg::placeholder { color: var(--ink3); }
   border-radius: 10px;
   padding: 0.6rem 0.8rem;
   cursor: pointer;
-  transition: border-color 0.15s;
 }
-.history-item:hover { border-color: #ccc; }
-
 .history-info { flex: 1; min-width: 0; }
-.history-relation {
-  font-size: 0.8rem; font-weight: 600; color: var(--ink);
+.history-relation { font-size: 0.8rem; font-weight: 600; color: var(--ink); }
+.history-snippet { font-size: 0.75rem; color: var(--ink3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.history-time { font-size: 0.7rem; color: var(--ink3); white-space: nowrap; }
+.history-delete { background: none; border: none; cursor: pointer; font-size: 1rem; color: var(--ink3); padding: 0.2rem; flex-shrink: 0; }
+.history-empty { font-size: 0.8rem; color: var(--ink3); font-style: italic; }
+
+.privacy-note {
+  display: flex; gap: 0.5rem; align-items: flex-start;
+  padding: 0.6rem 0; border-top: 1px solid var(--border);
+  font-size: 0.75rem; color: var(--ink3); line-height: 1.5;
 }
-.history-snippet {
-  font-size: 0.75rem; color: var(--ink3);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+
+/* ══════════════════════════════
+   PANTALLA 2 — CHAT
+══════════════════════════════ */
+#screen-chat {
+  display: none;
+  flex-direction: column;
+  height: 100dvh;
 }
-.history-time {
-  font-size: 0.7rem; color: var(--ink3); white-space: nowrap;
-}
-.history-delete {
-  background: none; border: none; cursor: pointer;
-  font-size: 1rem; color: var(--ink3);
-  padding: 0.2rem; transition: color 0.15s;
+
+/* chat header */
+.chat-header {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.9rem 1rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--white);
   flex-shrink: 0;
 }
-.history-delete:hover { color: #e53935; }
-
-.history-empty {
-  font-size: 0.8rem; color: var(--ink3); font-style: italic;
-  padding: 0.4rem 0;
+.chat-back {
+  background: none; border: none; cursor: pointer;
+  font-size: 1.4rem; color: var(--ink); padding: 0;
+  line-height: 1;
 }
+.chat-title { font-weight: 600; font-size: 1rem; flex: 1; }
+.chat-relation { font-size: 0.78rem; color: var(--ink3); }
+
+/* bubbles area */
+#chat-bubbles {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.bubble-wrap { display: flex; flex-direction: column; }
+.bubble-wrap.mine { align-items: flex-end; }
+.bubble-wrap.theirs { align-items: flex-start; }
+
+.bubble {
+  max-width: 80%;
+  padding: 0.65rem 0.9rem;
+  border-radius: 18px;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  position: relative;
+}
+.bubble.theirs {
+  background: #e8e8e8;
+  border-bottom-left-radius: 4px;
+  color: var(--ink);
+}
+.bubble.mine {
+  background: var(--green);
+  border-bottom-right-radius: 4px;
+  color: var(--ink);
+}
+.bubble-time {
+  font-size: 0.65rem;
+  color: var(--ink3);
+  margin-top: 0.2rem;
+  padding: 0 0.3rem;
+}
+.bubble-audio {
+  background: none; border: none; cursor: pointer;
+  font-size: 0.9rem; margin-left: 0.4rem;
+  vertical-align: middle; opacity: 0.6;
+}
+.bubble-audio:hover { opacity: 1; }
+
+/* reply options panel */
+#reply-options {
+  background: var(--white);
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+  max-height: 55vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.reply-options-inner {
+  padding: 0.8rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.reply-opt-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--ink3);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.reply-option {
+  background: var(--paper);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r);
+  padding: 0.75rem 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.reply-option.chosen { border-color: var(--green); background: #f0fff8; }
+
+.reply-opt-tone {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--ink3);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.reply-opt-ta {
+  width: 100%;
+  border: none;
+  background: transparent;
+  font-family: var(--sans);
+  font-size: 0.92rem;
+  color: var(--ink);
+  line-height: 1.5;
+  resize: none;
+  outline: none;
+  min-height: 48px;
+}
+.reply-opt-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.btn-use {
+  background: var(--green);
+  border: none;
+  border-radius: 999px;
+  padding: 0.28rem 0.85rem;
+  font-family: var(--sans);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--ink);
+  cursor: pointer;
+}
+.btn-use.used { background: var(--green-dk); }
+.btn-copy-sm {
+  background: none; border: none; cursor: pointer;
+  font-size: 0.9rem; color: var(--ink3);
+}
+
+/* loading dots inside chat */
+.chat-loading {
+  display: none;
+  justify-content: center;
+  padding: 0.8rem;
+}
+.chat-loading.visible { display: flex; }
+.dots { display: flex; gap: 0.35rem; }
+.dots span {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--green);
+  animation: bounce 1.2s infinite;
+}
+.dots span:nth-child(2) { animation-delay: 0.2s; }
+.dots span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes bounce {
+  0%,80%,100% { transform: translateY(0); }
+  40% { transform: translateY(-7px); }
+}
+
+/* bottom input bar */
+#chat-input-bar {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  border-top: 1px solid var(--border);
+  background: var(--white);
+  flex-shrink: 0;
+}
+#chat-input {
+  flex: 1;
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  padding: 0.55rem 0.9rem;
+  font-family: var(--sans);
+  font-size: 0.92rem;
+  resize: none;
+  outline: none;
+  max-height: 120px;
+  overflow-y: auto;
+  line-height: 1.4;
+  -webkit-appearance: none;
+}
+#chat-input:focus { border-color: var(--ink); }
+#chat-input::placeholder { color: var(--ink3); }
+#btn-chat-send {
+  width: 40px; height: 40px;
+  background: var(--green);
+  border: none; border-radius: 50%;
+  font-size: 1.1rem; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+#btn-chat-send:disabled { opacity: 0.4; }
 </style>
 </head>
 <body>
 
-<header>
-  <div class="wordmark">ea<span>b</span>lo</div>
-  <div class="header-hint">para cuando no debes responder tú solo</div>
-</header>
+<!-- ══ PANTALLA 1: HOME ══ -->
+<div id="screen-home">
+  <header>
+    <div class="wordmark">ea<span>b</span>lo</div>
+    <div class="header-hint">para cuando no debes responder tú solo</div>
+  </header>
 
-<main>
+  <div class="home-body">
 
-  <!-- RELATION -->
-  <div>
-    <div class="section-label">¿Quién te escribe?</div>
-    <div class="options-row" id="relation-pills">
-      <button class="pill" data-val="pareja">Pareja</button>
-      <button class="pill" data-val="amigo/a">Amigo/a</button>
-      <button class="pill" data-val="familia">Familia</button>
-      <button class="pill" data-val="trabajo">Trabajo</button>
-      <button class="pill" data-val="otro">Otro</button>
+    <div>
+      <div class="section-label">¿Quién te escribe?</div>
+      <div class="options-row" id="relation-pills">
+        <button class="pill" data-val="pareja">Pareja</button>
+        <button class="pill" data-val="amigo/a">Amigo/a</button>
+        <button class="pill" data-val="familia">Familia</button>
+        <button class="pill" data-val="trabajo">Trabajo</button>
+        <button class="pill" data-val="otro">Otro</button>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-label">Mensaje recibido</div>
+      <textarea id="msg" placeholder="Pega aquí lo que te han escrito…" rows="4"></textarea>
+    </div>
+
+    <div>
+      <div class="section-label">¿Qué quieres conseguir?</div>
+      <div class="options-row" id="goal-pills">
+        <button class="pill" data-val="calmar la situación">Calmar</button>
+        <button class="pill" data-val="disculparme">Disculparme</button>
+        <button class="pill" data-val="poner límites">Poner límites</button>
+        <button class="pill" data-val="no entrar en discusión">No discutir</button>
+        <button class="pill" data-val="reconectar">Reconectar</button>
+      </div>
+    </div>
+
+    <button id="btn-go" onclick="startChat()">Ayúdame a responder</button>
+
+    <div>
+      <div class="section-label">Conversaciones recientes</div>
+      <div class="history-list" id="history-list"></div>
+    </div>
+
+    <div class="privacy-note">
+      🔒 <span>Las últimas 3 conversaciones se guardan <strong>solo en este dispositivo</strong>. Nunca salen de aquí.</span>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ PANTALLA 2: CHAT ══ -->
+<div id="screen-chat">
+
+  <div class="chat-header">
+    <button class="chat-back" onclick="goHome()">‹</button>
+    <div>
+      <div class="chat-title" id="chat-title">Conversación</div>
+      <div class="chat-relation" id="chat-relation"></div>
     </div>
   </div>
 
-  <!-- MESSAGE -->
-  <div class="input-block">
-    <div class="section-label">Mensaje recibido</div>
-    <textarea id="msg" placeholder="Pega aquí lo que te han escrito…" rows="5"></textarea>
-  </div>
+  <div id="chat-bubbles"></div>
 
-  <!-- GOAL -->
-  <div>
-    <div class="section-label">¿Qué quieres conseguir?</div>
-    <div class="options-row" id="goal-pills">
-      <button class="pill" data-val="calmar la situación">Calmar</button>
-      <button class="pill" data-val="disculparme">Disculparme</button>
-      <button class="pill" data-val="poner límites">Poner límites</button>
-      <button class="pill" data-val="no entrar en discusión">No discutir</button>
-      <button class="pill" data-val="reconectar">Reconectar</button>
-    </div>
-  </div>
-
-  <!-- GO -->
-  <button id="btn-go" onclick="generate()">Ayúdame a responder</button>
-
-  <!-- LOADING -->
-  <div id="loading">
+  <div class="chat-loading" id="chat-loading">
     <div class="dots"><span></span><span></span><span></span></div>
-    <div class="loading-text">Leyendo la situación…</div>
   </div>
 
-  <!-- SITUATION READ -->
-  <div id="situation-read"></div>
-
-  <!-- REPLIES -->
-  <div id="replies"></div>
-
-  <!-- NEW -->
-  <button id="btn-new" onclick="resetForm()">← Nueva consulta</button>
-
-  <!-- HISTORY -->
-  <div id="history-block">
-    <div class="section-label">Conversaciones recientes</div>
-    <div class="history-list" id="history-list"></div>
+  <div id="reply-options" style="display:none;">
+    <div class="reply-options-inner" id="reply-options-inner"></div>
   </div>
 
-  <!-- PRIVACY -->
-  <div id="privacy-notice">
-    <span class="privacy-icon">🔒</span>
-    <span class="privacy-text">Las últimas 3 conversaciones se guardan <strong>solo en este dispositivo</strong> para darte mejor contexto. Nunca salen de aquí.</span>
+  <div id="chat-input-bar">
+    <textarea id="chat-input" placeholder="Pega el siguiente mensaje…" rows="1"
+      oninput="autoResize(this)"></textarea>
+    <button id="btn-chat-send" onclick="sendChatMsg()">↑</button>
   </div>
 
-</main>
+</div>
 
 <script>
+// ── STATE ──
 const STORAGE_KEY = 'eablo_v2_history';
 const MAX_HISTORY = 3;
 
 let selectedRelation = '';
 let selectedGoal = '';
-let currentMsg = '';
+let currentConv = null; // { id, relation, goal, messages: [{role, text, ts}] }
 
-// ── PRIVACY ──
-
-// ── PILLS ──
+// ── HOME PILLS ──
 document.querySelectorAll('#relation-pills .pill').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('#relation-pills .pill').forEach(b => b.classList.remove('active'));
@@ -414,7 +470,6 @@ document.querySelectorAll('#relation-pills .pill').forEach(btn => {
     selectedRelation = btn.dataset.val;
   });
 });
-
 document.querySelectorAll('#goal-pills .pill').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('#goal-pills .pill').forEach(b => b.classList.remove('active'));
@@ -423,103 +478,75 @@ document.querySelectorAll('#goal-pills .pill').forEach(btn => {
   });
 });
 
-// ── HISTORY ──
-function getHistory() {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
-  catch { return []; }
+// ── SCREEN NAV ──
+function showScreen(id) {
+  document.getElementById('screen-home').style.display = id === 'home' ? 'flex' : 'none';
+  document.getElementById('screen-chat').style.display = id === 'chat' ? 'flex' : 'none';
 }
-function saveHistory(history) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
-}
-function addToHistory(relation, snippet, message) {
-  const history = getHistory();
-  history.unshift({ id: Date.now(), relation, snippet, message, ts: Date.now() });
-  if (history.length > MAX_HISTORY) history.splice(MAX_HISTORY);
-  saveHistory(history);
+
+function goHome() {
+  // Save conversation before leaving
+  if (currentConv && currentConv.messages.length > 0) {
+    saveConv(currentConv);
+  }
+  currentConv = null;
+  showScreen('home');
   renderHistory();
 }
-function deleteHistoryItem(id) {
-  const history = getHistory().filter(h => h.id !== id);
-  saveHistory(history);
-  renderHistory();
-}
-function timeAgo(ts) {
-  const diff = (Date.now() - ts) / 1000;
-  if (diff < 3600) return `hace ${Math.round(diff/60)}m`;
-  if (diff < 86400) return `hace ${Math.round(diff/3600)}h`;
-  return `hace ${Math.round(diff/86400)}d`;
-}
-function renderHistory() {
-  const list = document.getElementById('history-list');
-  const history = getHistory();
-  if (history.length === 0) {
-    list.innerHTML = '<div class="history-empty">Sin conversaciones recientes</div>';
-    return;
-  }
-  list.innerHTML = history.map(h => `
-    <div class="history-item" onclick="loadHistory(${h.id})">
-      <div class="history-info">
-        <div class="history-relation">${h.relation}</div>
-        <div class="history-snippet">${h.snippet}</div>
-      </div>
-      <div class="history-time">${timeAgo(h.ts)}</div>
-      <button class="history-delete" onclick="event.stopPropagation(); deleteHistoryItem(${h.id})" title="Eliminar">🗑</button>
-    </div>
-  `).join('');
-}
-function loadHistory(id) {
-  const item = getHistory().find(h => h.id === id);
-  if (!item) return;
 
-  // Show conversation view
-  const repliesEl = document.getElementById('replies');
-  const sr = document.getElementById('situation-read');
-
-  // Show received message as bubble
-  sr.innerHTML = `
-    <div style="display:flex;flex-direction:column;gap:0.6rem;">
-      <div style="font-size:0.68rem;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:0.08em;">Mensaje recibido · ${item.relation}</div>
-      <div style="background:#f0f0f0;border-radius:14px 14px 14px 4px;padding:0.75rem 1rem;font-size:0.95rem;line-height:1.5;max-width:85%;">${item.message}</div>
-      ${item.chosenReply ? `
-      <div style="font-size:0.68rem;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:0.08em;text-align:right;">Tu respuesta</div>
-      <div style="background:var(--green);border-radius:14px 14px 4px 14px;padding:0.75rem 1rem;font-size:0.95rem;line-height:1.5;max-width:85%;align-self:flex-end;">
-        ${item.chosenReply}
-        <button onclick="speakText('${item.chosenReply.replace(/'/g,"\'")}', this)" style="background:none;border:none;cursor:pointer;font-size:1rem;margin-left:0.4rem;vertical-align:middle;" title="Escuchar">🔊</button>
-      </div>` : '<div style="font-size:0.8rem;color:var(--ink3);font-style:italic;text-align:right;">Sin respuesta elegida</div>'}
-    </div>
-  `;
-  sr.style.fontStyle = 'normal';
-  sr.classList.add('visible');
-  repliesEl.classList.remove('visible');
-  document.getElementById('btn-new').classList.add('visible');
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function speakText(text, btn) {
-  if ('speechSynthesis' in window) {
-    window.speechSynthesis.cancel();
-    const utt = new SpeechSynthesisUtterance(text);
-    utt.lang = 'es-ES';
-    utt.rate = 0.95;
-    btn.textContent = '⏹';
-    utt.onend = () => { btn.textContent = '🔊'; };
-    window.speechSynthesis.speak(utt);
-  }
-}
-
-// ── GENERATE ──
-async function generate() {
+// ── START NEW CHAT ──
+async function startChat() {
   const msg = document.getElementById('msg').value.trim();
   if (!msg) { alert('Pega el mensaje que recibiste.'); return; }
   if (!selectedRelation) { alert('¿Quién te escribe?'); return; }
   if (!selectedGoal) { alert('¿Qué quieres conseguir?'); return; }
 
-  // UI: loading
+  // Init conversation
+  currentConv = {
+    id: Date.now(),
+    relation: selectedRelation,
+    goal: selectedGoal,
+    messages: []
+  };
+
+  // Setup chat screen
+  document.getElementById('chat-title').textContent = selectedRelation.charAt(0).toUpperCase() + selectedRelation.slice(1);
+  document.getElementById('chat-relation').textContent = selectedGoal;
+  document.getElementById('chat-bubbles').innerHTML = '';
+  document.getElementById('reply-options').style.display = 'none';
   document.getElementById('btn-go').disabled = true;
-  document.getElementById('loading').classList.add('visible');
-  document.getElementById('situation-read').classList.remove('visible');
-  document.getElementById('replies').classList.remove('visible');
-  document.getElementById('btn-new').classList.remove('visible');
+
+  showScreen('chat');
+
+  // Add their message as bubble
+  addBubble('theirs', msg);
+  currentConv.messages.push({ role: 'theirs', text: msg, ts: Date.now() });
+
+  // Generate replies
+  await generateReplies(msg);
+  document.getElementById('btn-go').disabled = false;
+}
+
+// ── SEND NEXT MSG IN CHAT ──
+async function sendChatMsg() {
+  const input = document.getElementById('chat-input');
+  const msg = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+  autoResize(input);
+
+  addBubble('theirs', msg);
+  currentConv.messages.push({ role: 'theirs', text: msg, ts: Date.now() });
+
+  await generateReplies(msg);
+}
+
+// ── GENERATE REPLIES ──
+async function generateReplies(msg) {
+  document.getElementById('reply-options').style.display = 'none';
+  document.getElementById('chat-loading').classList.add('visible');
+  document.getElementById('btn-chat-send').disabled = true;
+  scrollBubbles();
 
   const history = getHistory().map(h => ({ relation: h.relation, snippet: h.snippet }));
 
@@ -529,81 +556,196 @@ async function generate() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         receivedMessage: msg,
-        relation: selectedRelation,
-        goal: selectedGoal,
+        relation: currentConv.relation,
+        goal: currentConv.goal,
         history
       })
     });
     const data = await resp.json();
     if (!resp.ok) throw new Error(data.error || 'Error');
 
-    const r = data.replies;
-
-    // Situation read
-    const sr = document.getElementById('situation-read');
-    sr.textContent = r.situation_read;
-    sr.classList.add('visible');
-
-    // Replies
-    const repliesEl = document.getElementById('replies');
-    repliesEl.innerHTML = [
-      { text: r.reply1, tone: r.tone1 },
-      { text: r.reply2, tone: r.tone2 },
-      { text: r.reply3, tone: r.tone3 }
-    ].map((rep, i) => `
-      <div class="reply-card">
-        <div class="reply-tone">${rep.tone}</div>
-        <div class="reply-text">${rep.text}</div>
-        <button class="reply-copy" onclick="copyReply(this, '${rep.text.replace(/'/g, "\\'")}')" title="Copiar">📋</button>
-        <div class="feedback-row">
-          <button class="fb-btn" onclick="feedback(${i}, 'good')">👍 Así hablaría</button>
-          <button class="fb-btn" onclick="feedback(${i}, 'bad')">👎 No es mi estilo</button>
-        </div>
-      </div>
-    `).join('');
-    repliesEl.classList.add('visible');
-
-    // Save to history
-    const snippet = msg.length > 50 ? msg.slice(0, 50) + '…' : msg;
-    addToHistory(selectedRelation, snippet, msg);
-
-    document.getElementById('btn-new').classList.add('visible');
+    showReplyOptions(data.replies);
 
   } catch (err) {
     alert('Algo ha ido mal. Inténtalo de nuevo.');
     console.error(err);
   } finally {
-    document.getElementById('loading').classList.remove('visible');
-    document.getElementById('btn-go').disabled = false;
+    document.getElementById('chat-loading').classList.remove('visible');
+    document.getElementById('btn-chat-send').disabled = false;
   }
 }
 
-function copyReply(btn, text) {
+// ── SHOW REPLY OPTIONS ──
+function showReplyOptions(r) {
+  const opts = [
+    { text: r.reply1, tone: r.tone1 },
+    { text: r.reply2, tone: r.tone2 },
+    { text: r.reply3, tone: r.tone3 }
+  ];
+
+  const inner = document.getElementById('reply-options-inner');
+  inner.innerHTML = `<div class="reply-opt-label">Elige, edita o escribe la tuya</div>` +
+    opts.map((o, i) => `
+      <div class="reply-option" id="ropt-${i}">
+        <div class="reply-opt-tone">${o.tone}</div>
+        <textarea class="reply-opt-ta" id="rta-${i}" rows="2">${o.text}</textarea>
+        <div class="reply-opt-actions">
+          <button class="btn-use" onclick="useReply(${i})">✓ Esta es la buena</button>
+          <button class="btn-copy-sm" onclick="copySmall(this, 'rta-${i}')">📋</button>
+        </div>
+      </div>
+    `).join('');
+
+  document.getElementById('reply-options').style.display = 'block';
+  scrollBubbles();
+}
+
+// ── USE A REPLY ──
+function useReply(index) {
+  const text = document.getElementById('rta-' + index).value.trim();
+  if (!text) return;
+
+  // Mark chosen
+  document.querySelectorAll('.reply-option').forEach(o => o.classList.remove('chosen'));
+  document.querySelectorAll('.btn-use').forEach(b => { b.textContent = '✓ Esta es la buena'; b.classList.remove('used'); });
+  document.getElementById('ropt-' + index).classList.add('chosen');
+  document.getElementById('ropt-' + index).querySelector('.btn-use').textContent = '✓ Elegida';
+  document.getElementById('ropt-' + index).querySelector('.btn-use').classList.add('used');
+
+  // Add as my bubble
+  addBubble('mine', text);
+  currentConv.messages.push({ role: 'mine', text, ts: Date.now() });
+
+  // Hide options
+  document.getElementById('reply-options').style.display = 'none';
+  scrollBubbles();
+}
+
+// ── BUBBLES ──
+function addBubble(role, text) {
+  const wrap = document.createElement('div');
+  wrap.className = `bubble-wrap ${role}`;
+
+  const now = new Date().toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' });
+
+  wrap.innerHTML = `
+    <div class="bubble ${role}">
+      ${escHtml(text)}
+      <button class="bubble-audio" onclick="speak('${escJs(text)}', this)">🔊</button>
+    </div>
+    <div class="bubble-time">${now}</div>
+  `;
+
+  document.getElementById('chat-bubbles').appendChild(wrap);
+  scrollBubbles();
+}
+
+function scrollBubbles() {
+  const el = document.getElementById('chat-bubbles');
+  setTimeout(() => { el.scrollTop = el.scrollHeight; }, 50);
+}
+
+// ── TTS ──
+function speak(text, btn) {
+  if (!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.lang = 'es-ES';
+  utt.rate = 0.95;
+  const orig = btn.textContent;
+  btn.textContent = '⏹';
+  utt.onend = () => { btn.textContent = orig; };
+  window.speechSynthesis.speak(utt);
+}
+
+// ── COPY ──
+function copySmall(btn, taId) {
+  const text = document.getElementById(taId).value;
   navigator.clipboard.writeText(text).then(() => {
     btn.textContent = '✅';
-    btn.classList.add('copied');
-    setTimeout(() => { btn.textContent = '📋'; btn.classList.remove('copied'); }, 1500);
+    setTimeout(() => { btn.textContent = '📋'; }, 1500);
   });
 }
 
-function feedback(index, type) {
-  // Store feedback for future learning (placeholder)
-  console.log('Feedback:', index, type);
-  // Visual confirmation
-  const cards = document.querySelectorAll('.reply-card');
-  const row = cards[index]?.querySelector('.feedback-row');
-  if (row) row.innerHTML = `<span style="font-size:0.75rem;color:var(--ink3)">${type === 'good' ? '✓ Guardado' : '✓ Anotado'}</span>`;
+// ── AUTO RESIZE TEXTAREA ──
+function autoResize(ta) {
+  ta.style.height = 'auto';
+  ta.style.height = Math.min(ta.scrollHeight, 120) + 'px';
 }
 
-function resetForm() {
-  document.getElementById('msg').value = '';
-  document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
-  selectedRelation = '';
-  selectedGoal = '';
-  document.getElementById('situation-read').classList.remove('visible');
-  document.getElementById('replies').classList.remove('visible');
-  document.getElementById('btn-new').classList.remove('visible');
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+// ── UTILS ──
+function escHtml(t) {
+  return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+}
+function escJs(t) {
+  return t.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,'\\n');
+}
+
+// ── HISTORY ──
+function getHistory() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+  catch { return []; }
+}
+function saveHistory(h) { localStorage.setItem(STORAGE_KEY, JSON.stringify(h)); }
+
+function saveConv(conv) {
+  const h = getHistory();
+  const firstTheirs = conv.messages.find(m => m.role === 'theirs');
+  if (!firstTheirs) return;
+  const snippet = firstTheirs.text.length > 50 ? firstTheirs.text.slice(0,50)+'…' : firstTheirs.text;
+  // Remove existing entry with same id
+  const filtered = h.filter(x => x.id !== conv.id);
+  filtered.unshift({ id: conv.id, relation: conv.relation, goal: conv.goal, snippet, messages: conv.messages, ts: Date.now() });
+  if (filtered.length > MAX_HISTORY) filtered.splice(MAX_HISTORY);
+  saveHistory(filtered);
+}
+
+function deleteHistoryItem(id) {
+  saveHistory(getHistory().filter(h => h.id !== id));
+  renderHistory();
+}
+
+function timeAgo(ts) {
+  const d = (Date.now() - ts) / 1000;
+  if (d < 3600) return `hace ${Math.round(d/60)}m`;
+  if (d < 86400) return `hace ${Math.round(d/3600)}h`;
+  return `hace ${Math.round(d/86400)}d`;
+}
+
+function renderHistory() {
+  const list = document.getElementById('history-list');
+  const h = getHistory();
+  if (!h.length) {
+    list.innerHTML = '<div class="history-empty">Sin conversaciones recientes</div>';
+    return;
+  }
+  list.innerHTML = h.map(item => `
+    <div class="history-item" onclick="openConv(${item.id})">
+      <div class="history-info">
+        <div class="history-relation">${item.relation}</div>
+        <div class="history-snippet">${item.snippet}</div>
+      </div>
+      <div class="history-time">${timeAgo(item.ts)}</div>
+      <button class="history-delete" onclick="event.stopPropagation();deleteHistoryItem(${item.id})">🗑</button>
+    </div>
+  `).join('');
+}
+
+function openConv(id) {
+  const item = getHistory().find(h => h.id === id);
+  if (!item) return;
+
+  currentConv = { id: item.id, relation: item.relation, goal: item.goal, messages: item.messages };
+
+  document.getElementById('chat-title').textContent = item.relation.charAt(0).toUpperCase() + item.relation.slice(1);
+  document.getElementById('chat-relation').textContent = item.goal;
+  document.getElementById('chat-bubbles').innerHTML = '';
+  document.getElementById('reply-options').style.display = 'none';
+
+  // Render all bubbles
+  item.messages.forEach(m => addBubble(m.role, m.text));
+
+  showScreen('chat');
 }
 
 // Init
