@@ -10,24 +10,43 @@ export default async function handler(req, res) {
   if (!apiKey) return res.status(500).json({ error: 'API key not configured' });
 
   try {
-    const { system, messages, temperature, max_tokens } = req.body;
+    const { receivedMessage, relation, goal, userStyle, history } = req.body;
+
+    const systemPrompt = `Eres un asistente que ayuda a responder mensajes difíciles o delicados.
+El usuario ha recibido un mensaje y necesita ayuda para responder bien.
+Tu trabajo es generar 3 respuestas posibles, cada una con un tono distinto pero todas naturales, humanas y adecuadas a la situación.
+
+Reglas:
+- Escribe como si fuera el propio usuario quien escribe, no como una IA
+- Sin florituras, sin formalidades innecesarias
+- Adapta el tono a la relación y al objetivo del usuario
+- Las respuestas deben parecer escritas desde el móvil, en el momento
+- Usa el estilo del usuario si está disponible
+- Ten en cuenta el historial de conversaciones anteriores si existe`;
+
+    const userPrompt = `Mensaje recibido: "${receivedMessage}"
+Relación: ${relation}
+Quiero conseguir: ${goal}
+${userStyle ? `Mi forma de escribir: ${userStyle}` : ''}
+${history && history.length > 0 ? `\nContexto de conversaciones anteriores:\n${history.map(h => `- Con ${h.relation}: "${h.snippet}"`).join('\n')}` : ''}
+
+Genera 3 respuestas posibles.`;
 
     const tool = {
-      name: "respond_to_user",
-      description: "Respond to the user in character",
+      name: "generate_replies",
+      description: "Generate 3 possible replies for the user",
       input_schema: {
         type: "object",
         properties: {
-          line:               { type: "string" },
-          subtitle_es:        { type: "string" },
-          char_name:          { type: "string" },
-          char_role:          { type: "string" },
-          natural_model:      { type: "string" },
-          expects_user_input: { type: "boolean" },
-          situation_ended:    { type: "boolean" },
-          mood:               { type: "string" }
+          reply1: { type: "string", description: "Primera opción de respuesta" },
+          reply2: { type: "string", description: "Segunda opción de respuesta" },
+          reply3: { type: "string", description: "Tercera opción de respuesta" },
+          tone1:  { type: "string", description: "Descripción corta del tono (ej: directo, con humor, cariñoso)" },
+          tone2:  { type: "string" },
+          tone3:  { type: "string" },
+          situation_read: { type: "string", description: "Lectura breve de la situación (1 frase)" }
         },
-        required: ["line","subtitle_es","char_name","char_role","natural_model","expects_user_input","situation_ended","mood"]
+        required: ["reply1", "reply2", "reply3", "tone1", "tone2", "tone3", "situation_read"]
       }
     };
 
@@ -40,26 +59,22 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
-        system,
-        messages,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userPrompt }],
         tools: [tool],
         tool_choice: { type: "any" },
-        temperature: temperature || 0.7,
-        max_tokens: max_tokens || 400
+        temperature: 0.8,
+        max_tokens: 800
       })
     });
 
     const data = await response.json();
     if (!response.ok) return res.status(response.status).json(data);
 
-    // Extract structured input from tool_use block
     const toolBlock = data.content.find(b => b.type === 'tool_use');
     if (!toolBlock) return res.status(500).json({ error: 'No tool_use block in response' });
 
-    // Return in same format frontend expects
-    return res.status(200).json({
-      content: [{ type: 'tool_result', input: toolBlock.input }]
-    });
+    return res.status(200).json({ replies: toolBlock.input });
 
   } catch (err) {
     return res.status(502).json({ error: 'Proxy error', detail: err.message });
