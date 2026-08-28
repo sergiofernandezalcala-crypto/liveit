@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>eablo</title>
+
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Comfortaa:wght@300&display=swap');
 
@@ -27,7 +28,8 @@
   --brand: 'Comfortaa', var(--sans);
 }
 
-html, body {
+html,
+body {
   height: 100%;
   overflow: hidden;
 }
@@ -283,7 +285,7 @@ textarea#msg::placeholder {
 }
 
 /* ══════════════════════════════
-   BURBUJAS
+   CHAT BUBBLES
 ══════════════════════════════ */
 
 #chat-bubbles {
@@ -296,82 +298,80 @@ textarea#msg::placeholder {
   gap: 0.6rem;
 }
 
-.bubble-wrap {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
+/*
+   CLASES ESPECÍFICAS DE EABLO.
+   Evitamos nombres genéricos como .bubble
+   para que WordPress/Astra no pueda pisarlos.
+*/
+
+.eablo-bubble-wrap {
+  width: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
-.bubble-wrap.theirs {
-  align-items: flex-start;
-}
-
-  .bubble-wrap.mine {
+.eablo-bubble-wrap.mine {
   align-items: flex-end !important;
-  width: 100% !important;
 }
 
-.bubble-wrap.theirs {
+.eablo-bubble-wrap.theirs {
   align-items: flex-start !important;
-  width: 100% !important;
 }
 
-.bubble.mine {
+.eablo-bubble {
+  display: block !important;
+  width: auto !important;
+  max-width: 80% !important;
+  padding: 0.65rem 0.9rem !important;
+  border-radius: 18px !important;
+  font-family: var(--sans) !important;
+  font-size: 0.95rem !important;
+  line-height: 1.5 !important;
+  position: relative !important;
+  margin: 0 !important;
+  box-shadow: none !important;
+}
+
+.eablo-bubble.mine {
   background: #00E676 !important;
   color: #111111 !important;
+  border-bottom-right-radius: 4px !important;
+  border-bottom-left-radius: 18px !important;
   margin-left: auto !important;
   margin-right: 0 !important;
 }
 
-.bubble.theirs {
+.eablo-bubble.theirs {
   background: #e8e8e8 !important;
   color: #111111 !important;
+  border-bottom-left-radius: 4px !important;
+  border-bottom-right-radius: 18px !important;
   margin-left: 0 !important;
   margin-right: auto !important;
 }
 
-.bubble {
-  max-width: 80%;
-  padding: 0.65rem 0.9rem;
-  border-radius: 18px;
-  font-size: 0.95rem;
-  line-height: 1.5;
-  position: relative;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
+.eablo-bubble-time {
+  font-size: 0.65rem !important;
+  color: var(--ink3) !important;
+  margin-top: 0.2rem !important;
+  padding: 0 0.3rem !important;
 }
 
-.bubble.theirs {
-  background: #E8E8E8;
-  color: #111111;
-  border-bottom-left-radius: 4px;
+.eablo-bubble-audio {
+  background: none !important;
+  border: none !important;
+  cursor: pointer !important;
+  font-size: 0.9rem !important;
+  margin-left: 0.4rem !important;
+  vertical-align: middle !important;
+  opacity: 0.6 !important;
+  padding: 0 !important;
 }
 
-.bubble.mine {
-  background: #00E676;
-  color: #111111;
-  border-bottom-right-radius: 4px;
-}
-
-.bubble-time {
-  font-size: 0.65rem;
-  color: var(--ink3);
-  margin-top: 0.2rem;
-  padding: 0 0.3rem;
-}
-
-.bubble-audio {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 0.9rem;
-  margin-left: 0.4rem;
-  vertical-align: middle;
-  opacity: 0.6;
-}
-
-.bubble-audio:hover {
-  opacity: 1;
+.eablo-bubble-audio:hover {
+  opacity: 1 !important;
 }
 
 /* reply options panel */
@@ -509,7 +509,7 @@ textarea#msg::placeholder {
   }
 }
 
-/* bottom input */
+/* input */
 
 #chat-input-bar {
   display: flex;
@@ -698,7 +698,6 @@ textarea#msg::placeholder {
     </div>
 
   </div>
-
 </div>
 
 <!-- ══ PANTALLA 2: CHAT ══ -->
@@ -738,21 +737,25 @@ textarea#msg::placeholder {
     class="chat-loading"
     id="chat-loading"
   >
+
     <div class="dots">
       <span></span>
       <span></span>
       <span></span>
     </div>
+
   </div>
 
   <div
     id="reply-options"
     style="display:none;"
   >
+
     <div
       class="reply-options-inner"
       id="reply-options-inner"
     ></div>
+
   </div>
 
   <div id="chat-input-bar">
@@ -801,7 +804,9 @@ document
 
       document
         .querySelectorAll('#relation-pills .pill')
-        .forEach(b => b.classList.remove('active'));
+        .forEach(b => {
+          b.classList.remove('active');
+        });
 
       btn.classList.add('active');
 
@@ -820,7 +825,9 @@ document
 
       document
         .querySelectorAll('#goal-pills .pill')
-        .forEach(b => b.classList.remove('active'));
+        .forEach(b => {
+          b.classList.remove('active');
+        });
 
       btn.classList.add('active');
 
@@ -960,14 +967,11 @@ function addMessage(role, text) {
 
   if (!currentConv) return;
 
-  const bubbleRole =
-    role === 'mine' ? 'mine' : 'theirs';
-
-  addBubble(bubbleRole, text);
+  addBubble(role, text);
 
   currentConv.messages.push({
 
-    role: bubbleRole,
+    role: role,
 
     text: text,
 
@@ -991,7 +995,8 @@ async function generateReplies() {
   document.getElementById('reply-options').style.display =
     'none';
 
-  document.getElementById('chat-loading')
+  document
+    .getElementById('chat-loading')
     .classList.add('visible');
 
   document.getElementById('btn-chat-send').disabled =
@@ -1024,9 +1029,7 @@ async function generateReplies() {
     const data = await resp.json();
 
     if (!resp.ok) {
-      throw new Error(
-        data.error || 'Error'
-      );
+      throw new Error(data.error || 'Error');
     }
 
     if (!data.replies) {
@@ -1039,10 +1042,7 @@ async function generateReplies() {
 
   } catch (err) {
 
-    console.error(
-      'Chat error:',
-      err
-    );
+    console.error('Chat error:', err);
 
     alert(
       'Algo ha ido mal. Inténtalo de nuevo.'
@@ -1050,11 +1050,12 @@ async function generateReplies() {
 
   } finally {
 
-    document.getElementById('chat-loading')
+    document
+      .getElementById('chat-loading')
       .classList.remove('visible');
 
-    document.getElementById('btn-chat-send')
-      .disabled = false;
+    document.getElementById('btn-chat-send').disabled =
+      false;
 
   }
 
@@ -1092,7 +1093,6 @@ function showReplyOptions(r) {
     );
 
   inner.innerHTML =
-
     '<div class="reply-opt-label">' +
     'Elige, edita o escribe la tuya' +
     '</div>' +
@@ -1136,9 +1136,8 @@ function showReplyOptions(r) {
 
     `).join('');
 
-  document.getElementById(
-    'reply-options'
-  ).style.display = 'block';
+  document.getElementById('reply-options').style.display =
+    'block';
 
   scrollBubbles();
 
@@ -1167,9 +1166,9 @@ function useReply(index) {
 
   document
     .querySelectorAll('.reply-option')
-    .forEach(o =>
-      o.classList.remove('chosen')
-    );
+    .forEach(o => {
+      o.classList.remove('chosen');
+    });
 
   document
     .querySelectorAll('.btn-use')
@@ -1217,7 +1216,9 @@ function addBubble(role, text) {
     document.createElement('div');
 
   wrap.className =
-    'bubble-wrap ' + role;
+    role === 'mine'
+      ? 'eablo-bubble-wrap mine'
+      : 'eablo-bubble-wrap theirs';
 
   const now =
     new Date().toLocaleTimeString('es', {
@@ -1229,7 +1230,9 @@ function addBubble(role, text) {
     document.createElement('div');
 
   bubble.className =
-    'bubble ' + role;
+    role === 'mine'
+      ? 'eablo-bubble mine'
+      : 'eablo-bubble theirs';
 
   bubble.textContent = text;
 
@@ -1237,7 +1240,7 @@ function addBubble(role, text) {
     document.createElement('button');
 
   audioBtn.className =
-    'bubble-audio';
+    'eablo-bubble-audio';
 
   audioBtn.textContent = '🔊';
 
@@ -1251,7 +1254,7 @@ function addBubble(role, text) {
     document.createElement('div');
 
   time.className =
-    'bubble-time';
+    'eablo-bubble-time';
 
   time.textContent = now;
 
@@ -1314,7 +1317,7 @@ async function speak(text, btn) {
         },
 
         body: JSON.stringify({
-          text
+          text: text
         })
 
       });
@@ -1440,12 +1443,36 @@ function autoResize(ta) {
 function escHtml(t) {
 
   return String(t)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;')
-    .replace(/\n/g, '<br>');
+
+    .replace(
+      /&/g,
+      '&amp;'
+    )
+
+    .replace(
+      /</g,
+      '&lt;'
+    )
+
+    .replace(
+      />/g,
+      '&gt;'
+    )
+
+    .replace(
+      /"/g,
+      '&quot;'
+    )
+
+    .replace(
+      /'/g,
+      '&#039;'
+    )
+
+    .replace(
+      /\n/g,
+      '<br>'
+    );
 
 }
 
@@ -1520,7 +1547,7 @@ function saveConv(conv) {
 
     goal: conv.goal,
 
-    snippet,
+    snippet: snippet,
 
     messages: conv.messages,
 
@@ -1529,9 +1556,12 @@ function saveConv(conv) {
   });
 
   if (
-    filtered.length > MAX_HISTORY
+    filtered.length >
+    MAX_HISTORY
   ) {
-    filtered.splice(MAX_HISTORY);
+    filtered.splice(
+      MAX_HISTORY
+    );
   }
 
   saveHistory(filtered);
@@ -1563,7 +1593,8 @@ function deleteHistoryItem(id) {
 function timeAgo(ts) {
 
   const d =
-    (Date.now() - ts) / 1000;
+    (Date.now() - ts) /
+    1000;
 
   if (d < 3600) {
 
@@ -1647,7 +1678,10 @@ function renderHistory() {
 
         <button
           class="history-delete"
-          onclick="event.stopPropagation(); deleteHistoryItem(${Number(item.id)})"
+          onclick="
+            event.stopPropagation();
+            deleteHistoryItem(${Number(item.id)})
+          "
         >
           🗑
         </button>
@@ -1680,14 +1714,17 @@ function openConv(id) {
 
     goal: item.goal,
 
-    messages: item.messages || []
+    messages:
+      item.messages || []
 
   };
 
   document.getElementById(
     'chat-title'
   ).textContent =
-    item.relation.charAt(0).toUpperCase() +
+    item.relation
+      .charAt(0)
+      .toUpperCase() +
     item.relation.slice(1);
 
   document.getElementById(
@@ -1701,16 +1738,17 @@ function openConv(id) {
 
   document.getElementById(
     'reply-options'
-  ).style.display = 'none';
+  ).style.display =
+    'none';
 
-  currentConv.messages.forEach(m => {
-
-    addBubble(
-      m.role,
-      m.text
-    );
-
-  });
+  currentConv.messages.forEach(
+    m => {
+      addBubble(
+        m.role,
+        m.text
+      );
+    }
+  );
 
   showScreen('chat');
 
