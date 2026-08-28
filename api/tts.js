@@ -21,13 +21,13 @@ export default async function handler(req, res) {
         body: JSON.stringify({
           input: { text },
           voice: {
-            languageCode: 'en-US',
-            name: 'en-US-Neural2-D',
-            ssmlGender: 'MALE'
+            languageCode: 'es-ES',
+            name: 'es-ES-Neural2-A',
+            ssmlGender: 'FEMALE'
           },
           audioConfig: {
             audioEncoding: 'MP3',
-            speakingRate: 0.85,
+            speakingRate: 0.95,
             pitch: 0
           }
         })
