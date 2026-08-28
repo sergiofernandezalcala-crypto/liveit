@@ -960,13 +960,16 @@ function addMessage(role, text) {
 
   if (!currentConv) return;
 
-  addBubble(role, text);
+  const bubbleRole =
+    role === 'mine' ? 'mine' : 'theirs';
+
+  addBubble(bubbleRole, text);
 
   currentConv.messages.push({
 
-    role,
+    role: bubbleRole,
 
-    text,
+    text: text,
 
     ts: Date.now()
 
