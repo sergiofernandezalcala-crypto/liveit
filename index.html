@@ -270,7 +270,7 @@ textarea#msg::placeholder { color: var(--ink3); }
 #btn-new.visible { display: block; }
 
 /* ── HISTORY ── */
-#history-block { display: flex; flex-direction: column; }
+#history-block { display: flex; flex-direction: column; gap: 0.4rem; margin-top: 0.5rem; }
 .history-list { display: flex; flex-direction: column; gap: 0.4rem; }
 
 .history-item {
@@ -383,7 +383,7 @@ textarea#msg::placeholder { color: var(--ink3); }
 </main>
 
 <script>
-const STORAGE_KEY = 'eablo_history';
+const STORAGE_KEY = 'eablo_v2_history';
 const MAX_HISTORY = 3;
 
 let selectedRelation = '';
