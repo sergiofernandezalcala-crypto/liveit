@@ -154,7 +154,6 @@ ${userStyle}
           input: conversation,
 
           generation_config: {
-            response_mime_type: 'application/json',
 
             response_schema: {
               type: 'object',
