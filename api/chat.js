@@ -40,19 +40,14 @@ Responde ÚNICAMENTE con JSON válido, sin markdown, sin texto antes ni después
           contents: [{ parts: [{ text: prompt }] }],
           generationConfig: {
             temperature: 0.8,
-            maxOutputTokens: 1000,
-            responseMimeType: 'application/json'
+            maxOutputTokens: 1000
           }
         })
       }
     );
 
     const data = await response.json();
-
-    if (!response.ok) {
-      console.error('Gemini error:', JSON.stringify(data));
-      return res.status(response.status).json({ error: 'Gemini error', detail: data });
-    }
+    if (!response.ok) return res.status(response.status).json({ error: 'Gemini error', detail: data });
 
     const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
     if (!text) return res.status(500).json({ error: 'Empty response from Gemini' });
@@ -63,7 +58,6 @@ Responde ÚNICAMENTE con JSON válido, sin markdown, sin texto antes ni después
     return res.status(200).json({ replies });
 
   } catch (err) {
-    console.error('Handler error:', err.message);
     return res.status(502).json({ error: 'Error', detail: err.message });
   }
 }
