@@ -306,8 +306,28 @@ textarea#msg::placeholder {
   align-items: flex-start;
 }
 
-.bubble-wrap.mine {
-  align-items: flex-end;
+  .bubble-wrap.mine {
+  align-items: flex-end !important;
+  width: 100% !important;
+}
+
+.bubble-wrap.theirs {
+  align-items: flex-start !important;
+  width: 100% !important;
+}
+
+.bubble.mine {
+  background: #00E676 !important;
+  color: #111111 !important;
+  margin-left: auto !important;
+  margin-right: 0 !important;
+}
+
+.bubble.theirs {
+  background: #e8e8e8 !important;
+  color: #111111 !important;
+  margin-left: 0 !important;
+  margin-right: auto !important;
 }
 
 .bubble {
