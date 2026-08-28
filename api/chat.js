@@ -31,8 +31,8 @@ Objetivo: ${goal}
 Responde ÚNICAMENTE con JSON válido, sin markdown, sin texto antes ni después:
 {"reply1":"...","reply2":"...","reply3":"...","tone1":"...","tone2":"...","tone3":"...","situation_read":"..."}`;
 
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+        const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
