@@ -455,24 +455,29 @@ textarea#msg::placeholder { color: var(--ink3); }
 
 <script>
 // ── STATE ──
-const STORAGE_KEY = 'eablo_v2_history';
+const STORAGE_KEY = 'eablo_session_history';
 const MAX_HISTORY = 3;
 
 let selectedRelation = '';
 let selectedGoal = '';
-let currentConv = null; // { id, relation, goal, messages: [{role, text, ts}] }
+let currentConv = null;
 
 // ── HOME PILLS ──
 document.querySelectorAll('#relation-pills .pill').forEach(btn => {
   btn.addEventListener('click', () => {
-    document.querySelectorAll('#relation-pills .pill').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('#relation-pills .pill')
+      .forEach(b => b.classList.remove('active'));
+
     btn.classList.add('active');
     selectedRelation = btn.dataset.val;
   });
 });
+
 document.querySelectorAll('#goal-pills .pill').forEach(btn => {
   btn.addEventListener('click', () => {
-    document.querySelectorAll('#goal-pills .pill').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('#goal-pills .pill')
+      .forEach(b => b.classList.remove('active'));
+
     btn.classList.add('active');
     selectedGoal = btn.dataset.val;
   });
@@ -480,16 +485,20 @@ document.querySelectorAll('#goal-pills .pill').forEach(btn => {
 
 // ── SCREEN NAV ──
 function showScreen(id) {
-  document.getElementById('screen-home').style.display = id === 'home' ? 'flex' : 'none';
-  document.getElementById('screen-chat').style.display = id === 'chat' ? 'flex' : 'none';
+  document.getElementById('screen-home').style.display =
+    id === 'home' ? 'flex' : 'none';
+
+  document.getElementById('screen-chat').style.display =
+    id === 'chat' ? 'flex' : 'none';
 }
 
 function goHome() {
-  // Save conversation before leaving
   if (currentConv && currentConv.messages.length > 0) {
     saveConv(currentConv);
   }
+
   currentConv = null;
+
   showScreen('home');
   renderHistory();
 }
@@ -497,11 +506,22 @@ function goHome() {
 // ── START NEW CHAT ──
 async function startChat() {
   const msg = document.getElementById('msg').value.trim();
-  if (!msg) { alert('Pega el mensaje que recibiste.'); return; }
-  if (!selectedRelation) { alert('¿Quién te escribe?'); return; }
-  if (!selectedGoal) { alert('¿Qué quieres conseguir?'); return; }
 
-  // Init conversation
+  if (!msg) {
+    alert('Pega el mensaje que recibiste.');
+    return;
+  }
+
+  if (!selectedRelation) {
+    alert('¿Quién te escribe?');
+    return;
+  }
+
+  if (!selectedGoal) {
+    alert('¿Qué quieres conseguir?');
+    return;
+  }
+
   currentConv = {
     id: Date.now(),
     relation: selectedRelation,
@@ -509,8 +529,10 @@ async function startChat() {
     messages: []
   };
 
-  // Setup chat screen
-  document.getElementById('chat-title').textContent = selectedRelation.charAt(0).toUpperCase() + selectedRelation.slice(1);
+  document.getElementById('chat-title').textContent =
+    selectedRelation.charAt(0).toUpperCase() +
+    selectedRelation.slice(1);
+
   document.getElementById('chat-relation').textContent = selectedGoal;
   document.getElementById('chat-bubbles').innerHTML = '';
   document.getElementById('reply-options').style.display = 'none';
@@ -518,57 +540,84 @@ async function startChat() {
 
   showScreen('chat');
 
-  // Add their message as bubble
-  addBubble('theirs', msg);
-  currentConv.messages.push({ role: 'theirs', text: msg, ts: Date.now() });
+  addMessage('theirs', msg);
 
-  // Generate replies
-  await generateReplies(msg);
+  await generateReplies();
+
   document.getElementById('btn-go').disabled = false;
 }
 
-// ── SEND NEXT MSG IN CHAT ──
+// ── SEND NEXT MESSAGE ──
 async function sendChatMsg() {
+  if (!currentConv) return;
+
   const input = document.getElementById('chat-input');
   const msg = input.value.trim();
+
   if (!msg) return;
+
   input.value = '';
   autoResize(input);
 
-  addBubble('theirs', msg);
-  currentConv.messages.push({ role: 'theirs', text: msg, ts: Date.now() });
+  addMessage('theirs', msg);
 
-  await generateReplies(msg);
+  await generateReplies();
+}
+
+// ── ADD MESSAGE ──
+function addMessage(role, text) {
+  if (!currentConv) return;
+
+  addBubble(role, text);
+
+  currentConv.messages.push({
+    role,
+    text,
+    ts: Date.now()
+  });
+
+  // Guardar inmediatamente para evitar perder la conversación
+  saveConv(currentConv);
 }
 
 // ── GENERATE REPLIES ──
-async function generateReplies(msg) {
+async function generateReplies() {
+  if (!currentConv) return;
+
   document.getElementById('reply-options').style.display = 'none';
   document.getElementById('chat-loading').classList.add('visible');
   document.getElementById('btn-chat-send').disabled = true;
-  scrollBubbles();
 
-  const history = getHistory().map(h => ({ relation: h.relation, snippet: h.snippet }));
+  scrollBubbles();
 
   try {
     const resp = await fetch('/api/chat', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify({
-        receivedMessage: msg,
         relation: currentConv.relation,
         goal: currentConv.goal,
-        history
+        messages: currentConv.messages
       })
     });
+
     const data = await resp.json();
-    if (!resp.ok) throw new Error(data.error || 'Error');
+
+    if (!resp.ok) {
+      throw new Error(data.error || 'Error');
+    }
+
+    if (!data.replies) {
+      throw new Error('Respuesta inválida del servidor');
+    }
 
     showReplyOptions(data.replies);
 
   } catch (err) {
+    console.error('Chat error:', err);
     alert('Algo ha ido mal. Inténtalo de nuevo.');
-    console.error(err);
   } finally {
     document.getElementById('chat-loading').classList.remove('visible');
     document.getElementById('btn-chat-send').disabled = false;
@@ -578,94 +627,175 @@ async function generateReplies(msg) {
 // ── SHOW REPLY OPTIONS ──
 function showReplyOptions(r) {
   const opts = [
-    { text: r.reply1, tone: r.tone1 },
-    { text: r.reply2, tone: r.tone2 },
-    { text: r.reply3, tone: r.tone3 }
+    {
+      text: r.reply1 || '',
+      tone: r.tone1 || ''
+    },
+    {
+      text: r.reply2 || '',
+      tone: r.tone2 || ''
+    },
+    {
+      text: r.reply3 || '',
+      tone: r.tone3 || ''
+    }
   ];
 
   const inner = document.getElementById('reply-options-inner');
-  inner.innerHTML = `<div class="reply-opt-label">Elige, edita o escribe la tuya</div>` +
+
+  inner.innerHTML =
+    '<div class="reply-opt-label">Elige, edita o escribe la tuya</div>' +
+
     opts.map((o, i) => `
       <div class="reply-option" id="ropt-${i}">
-        <div class="reply-opt-tone">${o.tone}</div>
-        <textarea class="reply-opt-ta" id="rta-${i}" rows="2">${o.text}</textarea>
+        <div class="reply-opt-tone">${escHtml(o.tone)}</div>
+
+        <textarea
+          class="reply-opt-ta"
+          id="rta-${i}"
+          rows="2"
+        >${escHtml(o.text)}</textarea>
+
         <div class="reply-opt-actions">
-          <button class="btn-use" onclick="useReply(${i})">✓ Esta es la buena</button>
-          <button class="btn-copy-sm" onclick="copySmall(this, 'rta-${i}')">📋</button>
+          <button
+            class="btn-use"
+            onclick="useReply(${i})"
+          >✓ Esta es la buena</button>
+
+          <button
+            class="btn-copy-sm"
+            onclick="copySmall(this, 'rta-${i}')"
+          >📋</button>
         </div>
       </div>
     `).join('');
 
   document.getElementById('reply-options').style.display = 'block';
+
   scrollBubbles();
 }
 
-// ── USE A REPLY ──
+// ── USE REPLY ──
 function useReply(index) {
-  const text = document.getElementById('rta-' + index).value.trim();
+  if (!currentConv) return;
+
+  const textarea = document.getElementById('rta-' + index);
+  if (!textarea) return;
+
+  const text = textarea.value.trim();
   if (!text) return;
 
-  // Mark chosen
-  document.querySelectorAll('.reply-option').forEach(o => o.classList.remove('chosen'));
-  document.querySelectorAll('.btn-use').forEach(b => { b.textContent = '✓ Esta es la buena'; b.classList.remove('used'); });
-  document.getElementById('ropt-' + index).classList.add('chosen');
-  document.getElementById('ropt-' + index).querySelector('.btn-use').textContent = '✓ Elegida';
-  document.getElementById('ropt-' + index).querySelector('.btn-use').classList.add('used');
+  document.querySelectorAll('.reply-option')
+    .forEach(o => o.classList.remove('chosen'));
 
-  // Add as my bubble
-  addBubble('mine', text);
-  currentConv.messages.push({ role: 'mine', text, ts: Date.now() });
+  document.querySelectorAll('.btn-use')
+    .forEach(b => {
+      b.textContent = '✓ Esta es la buena';
+      b.classList.remove('used');
+    });
 
-  // Hide options
+  const selected = document.getElementById('ropt-' + index);
+
+  selected.classList.add('chosen');
+
+  const button = selected.querySelector('.btn-use');
+  button.textContent = '✓ Elegida';
+  button.classList.add('used');
+
+  addMessage('mine', text);
+
   document.getElementById('reply-options').style.display = 'none';
+
   scrollBubbles();
 }
 
 // ── BUBBLES ──
 function addBubble(role, text) {
   const wrap = document.createElement('div');
+
   wrap.className = `bubble-wrap ${role}`;
 
-  const now = new Date().toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' });
+  const now = new Date().toLocaleTimeString('es', {
+    hour: '2-digit',
+    minute: '2-digit'
+  });
 
   wrap.innerHTML = `
     <div class="bubble ${role}">
       ${escHtml(text)}
-      <button class="bubble-audio" onclick="speak('${escJs(text)}', this)">🔊</button>
+      <button
+        class="bubble-audio"
+        onclick="speak('${escJs(text)}', this)"
+      >🔊</button>
     </div>
+
     <div class="bubble-time">${now}</div>
   `;
 
   document.getElementById('chat-bubbles').appendChild(wrap);
+
   scrollBubbles();
 }
 
+// ── SCROLL ──
 function scrollBubbles() {
   const el = document.getElementById('chat-bubbles');
-  setTimeout(() => { el.scrollTop = el.scrollHeight; }, 50);
+
+  setTimeout(() => {
+    el.scrollTop = el.scrollHeight;
+  }, 50);
 }
 
-// ── TTS (Google) ──
+// ── TTS ──
 async function speak(text, btn) {
   const orig = btn.textContent;
+
   btn.textContent = '⏳';
   btn.disabled = true;
+
   try {
     const resp = await fetch('/api/tts', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify({ text })
     });
+
     const data = await resp.json();
-    if (!data.audioContent) throw new Error('No audio');
-    const audio = new Audio('data:audio/mp3;base64,' + data.audioContent);
+
+    if (!data.audioContent) {
+      throw new Error('No audio');
+    }
+
+    const audio = new Audio(
+      'data:audio/mp3;base64,' + data.audioContent
+    );
+
     btn.textContent = '⏹';
-    audio.onended = () => { btn.textContent = orig; btn.disabled = false; };
-    audio.onerror = () => { btn.textContent = orig; btn.disabled = false; };
-    audio.play();
-    btn.onclick = () => { audio.pause(); audio.currentTime = 0; btn.textContent = orig; btn.disabled = false; };
+
+    audio.onended = () => {
+      btn.textContent = orig;
+      btn.disabled = false;
+    };
+
+    audio.onerror = () => {
+      btn.textContent = orig;
+      btn.disabled = false;
+    };
+
+    await audio.play();
+
+    btn.onclick = () => {
+      audio.pause();
+      audio.currentTime = 0;
+      btn.textContent = orig;
+      btn.disabled = false;
+    };
+
   } catch (err) {
     console.error('TTS error:', err);
+
     btn.textContent = orig;
     btn.disabled = false;
   }
@@ -674,94 +804,200 @@ async function speak(text, btn) {
 // ── COPY ──
 function copySmall(btn, taId) {
   const text = document.getElementById(taId).value;
-  navigator.clipboard.writeText(text).then(() => {
-    btn.textContent = '✅';
-    setTimeout(() => { btn.textContent = '📋'; }, 1500);
-  });
+
+  navigator.clipboard.writeText(text)
+    .then(() => {
+      btn.textContent = '✅';
+
+      setTimeout(() => {
+        btn.textContent = '📋';
+      }, 1500);
+    })
+    .catch(err => {
+      console.error('Copy error:', err);
+    });
 }
 
-// ── AUTO RESIZE TEXTAREA ──
+// ── AUTO RESIZE ──
 function autoResize(ta) {
   ta.style.height = 'auto';
-  ta.style.height = Math.min(ta.scrollHeight, 120) + 'px';
+
+  ta.style.height =
+    Math.min(ta.scrollHeight, 120) + 'px';
 }
 
-// ── UTILS ──
+// ── ESCAPE ──
 function escHtml(t) {
-  return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
-}
-function escJs(t) {
-  return t.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,'\\n');
+  return String(t)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;')
+    .replace(/\n/g, '<br>');
 }
 
-// ── HISTORY ──
-function getHistory() {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
-  catch { return []; }
+function escJs(t) {
+  return String(t)
+    .replace(/\\/g, '\\\\')
+    .replace(/'/g, "\\'")
+    .replace(/\n/g, '\\n')
+    .replace(/\r/g, '\\r');
 }
-function saveHistory(h) { localStorage.setItem(STORAGE_KEY, JSON.stringify(h)); }
+
+// ── SESSION HISTORY ──
+function getHistory() {
+  try {
+    return JSON.parse(
+      sessionStorage.getItem(STORAGE_KEY)
+    ) || [];
+  } catch {
+    return [];
+  }
+}
+
+function saveHistory(h) {
+  sessionStorage.setItem(
+    STORAGE_KEY,
+    JSON.stringify(h)
+  );
+}
 
 function saveConv(conv) {
+  if (!conv || !conv.messages || !conv.messages.length) {
+    return;
+  }
+
   const h = getHistory();
-  const firstTheirs = conv.messages.find(m => m.role === 'theirs');
+
+  const firstTheirs = conv.messages.find(
+    m => m.role === 'theirs'
+  );
+
   if (!firstTheirs) return;
-  const snippet = firstTheirs.text.length > 50 ? firstTheirs.text.slice(0,50)+'…' : firstTheirs.text;
-  // Remove existing entry with same id
-  const filtered = h.filter(x => x.id !== conv.id);
-  filtered.unshift({ id: conv.id, relation: conv.relation, goal: conv.goal, snippet, messages: conv.messages, ts: Date.now() });
-  if (filtered.length > MAX_HISTORY) filtered.splice(MAX_HISTORY);
+
+  const snippet =
+    firstTheirs.text.length > 50
+      ? firstTheirs.text.slice(0, 50) + '…'
+      : firstTheirs.text;
+
+  const filtered = h.filter(
+    x => x.id !== conv.id
+  );
+
+  filtered.unshift({
+    id: conv.id,
+    relation: conv.relation,
+    goal: conv.goal,
+    snippet,
+    messages: conv.messages,
+    ts: Date.now()
+  });
+
+  if (filtered.length > MAX_HISTORY) {
+    filtered.splice(MAX_HISTORY);
+  }
+
   saveHistory(filtered);
 }
 
+// ── DELETE ──
 function deleteHistoryItem(id) {
-  saveHistory(getHistory().filter(h => h.id !== id));
+  saveHistory(
+    getHistory().filter(h => h.id !== id)
+  );
+
   renderHistory();
 }
 
+// ── TIME ──
 function timeAgo(ts) {
   const d = (Date.now() - ts) / 1000;
-  if (d < 3600) return `hace ${Math.round(d/60)}m`;
-  if (d < 86400) return `hace ${Math.round(d/3600)}h`;
-  return `hace ${Math.round(d/86400)}d`;
+
+  if (d < 3600) {
+    return `hace ${Math.max(1, Math.round(d / 60))}m`;
+  }
+
+  if (d < 86400) {
+    return `hace ${Math.round(d / 3600)}h`;
+  }
+
+  return `hace ${Math.round(d / 86400)}d`;
 }
 
+// ── RENDER HISTORY ──
 function renderHistory() {
   const list = document.getElementById('history-list');
   const h = getHistory();
+
   if (!h.length) {
-    list.innerHTML = '<div class="history-empty">Sin conversaciones recientes</div>';
+    list.innerHTML =
+      '<div class="history-empty">Sin conversaciones recientes</div>';
     return;
   }
+
   list.innerHTML = h.map(item => `
-    <div class="history-item" onclick="openConv(${item.id})">
+    <div
+      class="history-item"
+      onclick="openConv(${Number(item.id)})"
+    >
       <div class="history-info">
-        <div class="history-relation">${item.relation}</div>
-        <div class="history-snippet">${item.snippet}</div>
+        <div class="history-relation">
+          ${escHtml(item.relation)}
+        </div>
+
+        <div class="history-snippet">
+          ${escHtml(item.snippet)}
+        </div>
       </div>
-      <div class="history-time">${timeAgo(item.ts)}</div>
-      <button class="history-delete" onclick="event.stopPropagation();deleteHistoryItem(${item.id})">🗑</button>
+
+      <div class="history-time">
+        ${timeAgo(item.ts)}
+      </div>
+
+      <button
+        class="history-delete"
+        onclick="event.stopPropagation(); deleteHistoryItem(${Number(item.id)})"
+      >🗑</button>
     </div>
   `).join('');
 }
 
+// ── OPEN OLD CONVERSATION ──
 function openConv(id) {
-  const item = getHistory().find(h => h.id === id);
+  const item = getHistory().find(
+    h => h.id === id
+  );
+
   if (!item) return;
 
-  currentConv = { id: item.id, relation: item.relation, goal: item.goal, messages: item.messages };
+  currentConv = {
+    id: item.id,
+    relation: item.relation,
+    goal: item.goal,
+    messages: item.messages || []
+  };
 
-  document.getElementById('chat-title').textContent = item.relation.charAt(0).toUpperCase() + item.relation.slice(1);
-  document.getElementById('chat-relation').textContent = item.goal;
+  document.getElementById('chat-title').textContent =
+    item.relation.charAt(0).toUpperCase() +
+    item.relation.slice(1);
+
+  document.getElementById('chat-relation').textContent =
+    item.goal;
+
   document.getElementById('chat-bubbles').innerHTML = '';
-  document.getElementById('reply-options').style.display = 'none';
 
-  // Render all bubbles
-  item.messages.forEach(m => addBubble(m.role, m.text));
+  document.getElementById('reply-options').style.display =
+    'none';
+
+  currentConv.messages.forEach(m => {
+    addBubble(m.role, m.text);
+  });
 
   showScreen('chat');
 }
 
-// Init
+// ── INIT ──
 renderHistory();
 </script>
 </body>
