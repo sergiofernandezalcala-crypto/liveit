@@ -146,7 +146,7 @@ export default async function handler(req, res) {
           input: conversation,
 
           generation_config: {
-            max_output_tokens: 1000
+            max_output_tokens: 2000
           },
 
           response_format: {
