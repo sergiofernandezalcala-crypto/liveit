@@ -22,7 +22,7 @@ export default async function handler(req, res) {
           input: { text },
           voice: {
             languageCode: 'es-ES',
-            name: 'es-ES-Neural2-A',
+            name: 'es-ES-Neural2-C',
             ssmlGender: 'FEMALE'
           },
           audioConfig: {
