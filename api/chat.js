@@ -1,3 +1,4 @@
+```js
 export default async function handler(req, res) {
 
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -55,12 +56,14 @@ export default async function handler(req, res) {
 
     const conversation = messages
       .map(m => {
+
         const who =
           m.role === 'mine'
             ? 'USUARIO'
             : 'OTRA PERSONA';
 
         return `${who}: ${m.text}`;
+
       })
       .join('\n');
 
@@ -85,6 +88,7 @@ OBJETIVO:
 ${goal}
 
 CONVERSACIÓN COMPLETA:
+
 ${conversation}
 
 REGLAS:
@@ -103,7 +107,8 @@ REGLAS:
 - No hagas las tres respuestas casi iguales.
 - Las tres deben poder enviarse realmente.
 - Ten en cuenta toda la conversación anterior.
-- No trates el último mensaje como una conversación aislada.
+- No trates el último mensaje como si fuera una
+  conversación aislada.
 - No repitas simplemente las palabras de la otra persona.
 - Haz avanzar la conversación.
 - Respeta el objetivo indicado.
@@ -131,6 +136,9 @@ ${userStyle ? `
 ESTILO DEL USUARIO:
 ${userStyle}
 ` : ''}
+
+Devuelve únicamente un objeto JSON válido con estos campos:
+reply1, reply2, reply3, tone1, tone2, tone3, situation_read.
 `;
 
     // ── INTERACTIONS API ──
@@ -154,11 +162,18 @@ ${userStyle}
           input: conversation,
 
           generation_config: {
+            max_output_tokens: 1000
+          },
 
-            response_schema: {
+          response_format: {
+            type: 'text',
+            mime_type: 'application/json',
+
+            schema: {
               type: 'object',
 
               properties: {
+
                 reply1: {
                   type: 'string'
                 },
@@ -186,6 +201,7 @@ ${userStyle}
                 situation_read: {
                   type: 'string'
                 }
+
               },
 
               required: [
@@ -210,7 +226,10 @@ ${userStyle}
 
     if (!response.ok) {
 
-      console.error('Gemini error:', data);
+      console.error(
+        'Gemini error:',
+        data
+      );
 
       return res.status(response.status).json({
         error: 'Gemini error',
@@ -218,18 +237,18 @@ ${userStyle}
       });
     }
 
-    // Interactions API devuelve el texto generado
-    // dentro de output.
-    const output = Array.isArray(data.output)
-      ? data.output
+    // ── EXTRAER TEXTO DE INTERACTIONS API ──
+
+    const steps = Array.isArray(data.steps)
+      ? data.steps
       : [];
 
-    const messageOutput = output.find(
-      item => item.type === 'message'
-    );
+    const modelOutput = [...steps]
+      .reverse()
+      .find(step => step.type === 'model_output');
 
     const text =
-      messageOutput?.content?.find(
+      modelOutput?.content?.find(
         item => item.type === 'text'
       )?.text || '';
 
@@ -245,12 +264,14 @@ ${userStyle}
       });
     }
 
-    // ── JSON ──
+    // ── PARSEAR JSON ──
 
     let replies;
 
     try {
+
       replies = JSON.parse(text);
+
     } catch (err) {
 
       console.error(
@@ -283,3 +304,4 @@ ${userStyle}
     });
   }
 }
+```
